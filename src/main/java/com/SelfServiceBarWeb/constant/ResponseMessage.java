@@ -11,4 +11,10 @@ public class ResponseMessage {
     public static final String UNIMPLEMENTED_SERVICE = "未实现的接口服务";
     public static final String INNER_SERVER_ERROR = "内部服务器错误";
     public static final String ERROR_PARAM = "参数错误";
+
+    public static final String LOGIN_FAILED = "用户名或者密码错误";
+    public static final String DO_NOT_LOGIN = "您还未登陆，请先登陆";
+    public static final String INVALID_USER_TOKEN = "无效的token，请重新登陆";
+    public static final String EXPIRED_USER_TOKEN = "token已过期，请重新登陆";
+    public static final String ALREADY_LOGIN = "您已经在其它地点登陆，请重新登陆";
 }
