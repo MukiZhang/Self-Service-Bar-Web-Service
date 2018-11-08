@@ -26,14 +26,17 @@ public class SeatService {
         this.seatMapper = seatMapper;
     }
 
-    public List<Seat> getByTableId(String tableId) throws Exception {
+    public List<Seat> getByTableId(String tableId, String token) throws Exception {
         List<Seat> seats = seatMapper.getByTableId(tableId);
         return seats;
     }
 
     public Seat getBySeatId(String seatId, String token, TokenTypeEnum tokenTypeEnum) throws Exception {
         //验证token，用户或者管理员
-        return seatMapper.getBySeatId(seatId);
+        Seat seat = seatMapper.getBySeatId(seatId);
+        if (seat == null)
+            throw new SelfServiceBarWebException(400, ResponseMessage.ERROR, ResponseMessage.GET_SEAT_INFO_ERROR);
+        return seat;
     }
 
     public Seat createNewSeat(CreateSeatRequest createSeatRequest) {
@@ -54,7 +57,7 @@ public class SeatService {
     public Seat changeSeatState(String seatId, ChangeSeatRequest changeSeatRequest) {
         Seat seat = seatMapper.getBySeatId(seatId);
         if (seat == null)
-            throw new SelfServiceBarWebException(400, ResponseMessage.ERROR, ResponseMessage.CHANGE_SEAT_STATE_ERROR);
+            throw new SelfServiceBarWebException(400, ResponseMessage.ERROR, ResponseMessage.GET_SEAT_INFO_ERROR);
         //修改seat状态
         return seat;
     }
