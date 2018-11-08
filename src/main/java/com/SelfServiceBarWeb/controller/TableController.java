@@ -8,11 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@RequestMapping(path = "/table")
+@RequestMapping(path = "/tables")
 @RestController
 @EnableAutoConfiguration
 @Api(tags = "Table", description = "桌子相关操作")
@@ -24,9 +25,11 @@ public class TableController {
         this.tableService = tableService;
     }
 
-    @ApiOperation(value = "获取桌椅信息")
-    @RequestMapping(path = "/getAllTable", method = RequestMethod.GET)
-    public List<Table> getAllTable() throws Exception {
+    @ApiOperation(value = "获取所有桌椅信息")
+    @RequestMapping(path = "/all", method = RequestMethod.GET)
+    public List<Table> getAllTable(@RequestParam(value = "token") String token) throws Exception {
         return tableService.getAllTable();
     }
+
+
 }
