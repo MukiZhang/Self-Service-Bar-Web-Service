@@ -1,8 +1,13 @@
 package com.SelfServiceBarWeb.service;
 
+import com.SelfServiceBarWeb.constant.ResponseMessage;
 import com.SelfServiceBarWeb.mapper.SeatMapper;
 import com.SelfServiceBarWeb.model.Seat;
 
+import com.SelfServiceBarWeb.model.SelfServiceBarWebException;
+import com.SelfServiceBarWeb.model.request.ChangeSeatRequest;
+import com.SelfServiceBarWeb.model.request.CreateSeatRequest;
+import com.SelfServiceBarWeb.model.request.TokenTypeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,5 +29,33 @@ public class SeatService {
     public List<Seat> getByTableId(String tableId) throws Exception {
         List<Seat> seats = seatMapper.getByTableId(tableId);
         return seats;
+    }
+
+    public Seat getBySeatId(String seatId, String token, TokenTypeEnum tokenTypeEnum) throws Exception {
+        //验证token，用户或者管理员
+        return seatMapper.getBySeatId(seatId);
+    }
+
+    public Seat createNewSeat(CreateSeatRequest createSeatRequest) {
+        //createSeatRequest.getLoginToken();
+
+        Seat seat = new Seat();
+        seat.setId(String.valueOf(seatMapper.findMaxId() + 1));
+        seat.setHardwareId(createSeatRequest.getHardwareId());
+        seat.setIpAddress(createSeatRequest.getIpAddress());
+        seat.setTable_id(createSeatRequest.getTable_id());
+        seat.setPosition_x(createSeatRequest.getPosition_x());
+        seat.setPosition_y(createSeatRequest.getPosition_y());
+
+        seatMapper.createNewSeat(seat);
+        return seat;
+    }
+
+    public Seat changeSeatState(String seatId, ChangeSeatRequest changeSeatRequest) {
+        Seat seat = seatMapper.getBySeatId(seatId);
+        if (seat == null)
+            throw new SelfServiceBarWebException(400, ResponseMessage.ERROR, ResponseMessage.CHANGE_SEAT_STATE_ERROR);
+        //修改seat状态
+        return seat;
     }
 }

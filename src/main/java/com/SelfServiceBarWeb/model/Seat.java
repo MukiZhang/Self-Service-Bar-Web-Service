@@ -11,14 +11,11 @@ public class Seat {
     @ApiModelProperty(value = "座位id")
     private String id;
 
-    @ApiModelProperty(value = "无人吧id")
-    private String bar_id;
+    @ApiModelProperty(value = "座位的ip地址")
+    private String ipAddress;
 
-    @ApiModelProperty(value = "硬件状态", hidden = true)
-    private String state;
-
-    @ApiModelProperty(value = "开关", hidden = true)
-    private String open;
+    @ApiModelProperty(value = "座位的硬件id")
+    private String hardwareId;
 
     @ApiModelProperty(value = "座位横坐标")
     private String position_x;
@@ -37,26 +34,20 @@ public class Seat {
         this.id = id;
     }
 
-    public String getBar_id() {
-        return bar_id;
+    public String getIpAddress() {
+        return ipAddress;
     }
 
-    public void setBar_id(String bar_id) {
-        this.bar_id = bar_id;
+    public void setIpAddress(String ipAddress) {
+        this.ipAddress = ipAddress;
     }
 
-    public String  getState() { return state; }
-
-    public void setState(String state) {
-        this.state = state;
+    public String getHardwareId() {
+        return hardwareId;
     }
 
-    public String getOpen() {
-        return open;
-    }
-
-    public void setOpen(String open) {
-        this.open = open;
+    public void setHardwareId(String hardwareId) {
+        this.hardwareId = hardwareId;
     }
 
     public String getPosition_x() { return position_x; }

@@ -28,7 +28,7 @@ public class TableController {
     @ApiOperation(value = "获取所有桌椅信息")
     @RequestMapping(path = "/all", method = RequestMethod.GET)
     public List<Table> getAllTable(@RequestParam(value = "token") String token) throws Exception {
-        return tableService.getAllTable();
+        return tableService.getAllTable(token);
     }
 
 

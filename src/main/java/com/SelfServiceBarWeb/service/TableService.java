@@ -12,14 +12,16 @@ import java.util.List;
 public class TableService {
     private final TableMapper tableMapper;
     private final SeatMapper seatMapper;
+    private final AdministratorService administratorService;
 
     @Autowired
-    public TableService(TableMapper tableMapper, SeatMapper seatMapper) {
+    public TableService(TableMapper tableMapper, SeatMapper seatMapper, AdministratorService administratorService) {
         this.tableMapper = tableMapper;
         this.seatMapper = seatMapper;
+        this.administratorService = administratorService;
     }
 
-    public List<Table> getAllTable() throws Exception {
+    public List<Table> getAllTable(String token) throws Exception {
         List<Table> tables = tableMapper.getAll();
         for(Table table: tables) {
             table.setSeats(seatMapper.getByTableId(table.getId()));

@@ -26,13 +26,13 @@ public class MonitorController {
     //该请求由管理员调用
     @ApiOperation(value = "获取该无人吧内所有监控的信息")
     @RequestMapping(path = "/all", method = RequestMethod.GET)
-    public List<Monitor> getAllLightInfo(@RequestParam(value = "token") String token) throws Exception {
+    public List<Monitor> getAllMonitorInfo(@RequestParam(value = "token") String token) throws Exception {
         throw new UnsupportedOperationException();
     }
 
     @ApiOperation(value = "添加新设备")
     @RequestMapping(path = "", method = RequestMethod.POST)
-    public Monitor getEntranceInfo(@RequestBody CreateMonitorRequest createMonitorRequest) throws Exception {
+    public Monitor createNewMonitor(@RequestBody CreateMonitorRequest createMonitorRequest) throws Exception {
         throw new UnsupportedOperationException();
     }
 
@@ -40,7 +40,7 @@ public class MonitorController {
     //该请求可能是用户调用  或者是管理员调用
     @ApiOperation(value = "更改监控的状态")
     @RequestMapping(path = "/{monitorId}", method = RequestMethod.PATCH)
-    public Monitor changeLightState(@PathVariable(value = "monitorId") String monitorId, @RequestBody ChangeMonitorRequest changeMonitorRequest) throws Exception {
+    public Monitor changeMonitorState(@PathVariable(value = "monitorId") String monitorId, @RequestBody ChangeMonitorRequest changeMonitorRequest) throws Exception {
         throw new UnsupportedOperationException();
     }
 }

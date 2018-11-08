@@ -33,21 +33,21 @@ public class SeatController {
     //该请求可能是用户调用  或者是管理员调用
     @ApiOperation(value = "获取指定id的座位信息")
     @RequestMapping(path = "/{seatId}", method = RequestMethod.GET)
-    public Seat getLightInfo(@PathVariable(value = "seatId") String seatId, @RequestParam(value = "token") String token, @RequestParam(value = "tokenType") TokenTypeEnum tokenTypeEnum) throws Exception {
-        throw new UnsupportedOperationException();
+    public Seat getSeatInfo(@PathVariable(value = "seatId") String seatId, @RequestParam(value = "token") String token, @RequestParam(value = "tokenType") TokenTypeEnum tokenTypeEnum) throws Exception {
+        return seatService.getBySeatId(seatId, token, tokenTypeEnum);
     }
 
     @ApiOperation(value = "添加新设备")
     @RequestMapping(path = "", method = RequestMethod.POST)
-    public Seat getEntranceInfo(@RequestBody CreateSeatRequest createSeatRequest) throws Exception {
-        throw new UnsupportedOperationException();
+    public Seat createNewSeat(@RequestBody CreateSeatRequest createSeatRequest) throws Exception {
+        return seatService.createNewSeat(createSeatRequest);
     }
 
     //todo  暂时不知道座位的控制方式，在更改状态时需要传递的参数
     //该请求可能是用户调用  或者是管理员调用
     @ApiOperation(value = "更改座位的状态")
-    @RequestMapping(path = "/{lightId}", method = RequestMethod.PATCH)
-    public Seat changeLightState(@PathVariable(value = "lightId") String lightId, @RequestBody ChangeSeatRequest changeSeatRequest) throws Exception {
-        throw new UnsupportedOperationException();
+    @RequestMapping(path = "/{seatId}", method = RequestMethod.PATCH)
+    public Seat changeSeatState(@PathVariable(value = "seatId") String seatId, @RequestBody ChangeSeatRequest changeSeatRequest) throws Exception {
+        return seatService.changeSeatState(seatId, changeSeatRequest);
     }
 }
