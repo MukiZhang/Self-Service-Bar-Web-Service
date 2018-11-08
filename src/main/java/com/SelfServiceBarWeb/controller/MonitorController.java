@@ -36,7 +36,7 @@ public class MonitorController {
         throw new UnsupportedOperationException();
     }
 
-    //todo  暂时不知道灯的控制方式，在更改状态时需要传递的参数
+    //todo  暂时不知道监控的控制方式，在更改状态时需要传递的参数
     //该请求可能是用户调用  或者是管理员调用
     @ApiOperation(value = "更改监控的状态")
     @RequestMapping(path = "/{monitorId}", method = RequestMethod.PATCH)

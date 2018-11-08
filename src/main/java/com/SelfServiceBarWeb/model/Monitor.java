@@ -5,22 +5,14 @@ import io.swagger.annotations.ApiModelProperty;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Monitor {
-    @ApiModelProperty(value = "门禁id")
+    @ApiModelProperty(value = "监控的id")
     private String id;
 
-    @ApiModelProperty(value = "ip地址")
+    @ApiModelProperty(value = "监控的ip地址")
     private String ipAddress;
 
-    @ApiModelProperty(value = "设备控制token")
-    private String token;
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
+    @ApiModelProperty(value = "监控的硬件id")
+    private String hardwareId;
 
     public String getId() {
         return id;
@@ -36,5 +28,13 @@ public class Monitor {
 
     public void setIpAddress(String ipAddress) {
         this.ipAddress = ipAddress;
+    }
+
+    public String getHardwareId() {
+        return hardwareId;
+    }
+
+    public void setHardwareId(String hardwareId) {
+        this.hardwareId = hardwareId;
     }
 }
