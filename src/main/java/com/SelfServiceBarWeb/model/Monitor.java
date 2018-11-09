@@ -3,18 +3,15 @@ package com.SelfServiceBarWeb.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModelProperty;
 
-/**
- * Created by Muki on 2018/11/6
- */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Light {
-    @ApiModelProperty(value = "灯的id")
+public class Monitor {
+    @ApiModelProperty(value = "监控的id")
     private String id;
 
-    @ApiModelProperty(value = "灯的ip地址")
+    @ApiModelProperty(value = "监控的ip地址")
     private String ipAddress;
 
-    @ApiModelProperty(value = "灯的硬件id")
+    @ApiModelProperty(value = "监控的硬件id")
     private String hardwareId;
 
     public String getId() {

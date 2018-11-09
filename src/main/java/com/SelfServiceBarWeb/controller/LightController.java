@@ -38,7 +38,7 @@ public class LightController {
 
     @ApiOperation(value = "添加新设备")
     @RequestMapping(path = "", method = RequestMethod.POST)
-    public Light getEntranceInfo(@RequestBody CreateLightRequest createLightRequest) throws Exception {
+    public Light createNewLight(@RequestBody CreateLightRequest createLightRequest) throws Exception {
         throw new UnsupportedOperationException();
     }
 
