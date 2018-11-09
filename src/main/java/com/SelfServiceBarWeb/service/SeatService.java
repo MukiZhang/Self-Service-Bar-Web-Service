@@ -7,7 +7,6 @@ import com.SelfServiceBarWeb.model.Seat;
 import com.SelfServiceBarWeb.model.SelfServiceBarWebException;
 import com.SelfServiceBarWeb.model.request.ChangeSeatRequest;
 import com.SelfServiceBarWeb.model.request.CreateSeatRequest;
-import com.SelfServiceBarWeb.model.request.TokenTypeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +30,7 @@ public class SeatService {
         return seats;
     }
 
-    public Seat getBySeatId(String seatId, String token, TokenTypeEnum tokenTypeEnum) throws Exception {
+    public Seat getBySeatId(String seatId, String token) throws Exception {
         //验证token，用户或者管理员
         Seat seat = seatMapper.getBySeatId(seatId);
         if (seat == null)

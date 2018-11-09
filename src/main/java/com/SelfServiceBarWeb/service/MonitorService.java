@@ -6,7 +6,6 @@ import com.SelfServiceBarWeb.model.Monitor;
 import com.SelfServiceBarWeb.model.SelfServiceBarWebException;
 import com.SelfServiceBarWeb.model.request.ChangeMonitorRequest;
 import com.SelfServiceBarWeb.model.request.CreateMonitorRequest;
-import com.SelfServiceBarWeb.model.request.TokenTypeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +25,7 @@ public class MonitorService {
         return monitors;
     }
 
-    public Monitor getByMonitorId(String monitorId, String token, TokenTypeEnum tokenTypeEnum) throws Exception {
+    public Monitor getByMonitorId(String monitorId, String token) throws Exception {
         //验证token，用户或者管理员
         Monitor monitor = monitorMapper.getByMonitorId(monitorId);
         if (monitor == null)

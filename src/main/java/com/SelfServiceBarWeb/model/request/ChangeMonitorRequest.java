@@ -6,19 +6,8 @@ public class ChangeMonitorRequest {
     @ApiModelProperty(value = "更改模式：开、关")
     private SeatStateEnum mode;
 
-    @ApiModelProperty(value = "token类型：管理员或用户")
-    private TokenTypeEnum tokenTypeEnum;
-
     @ApiModelProperty(value = "token")
     private String token;
-
-    public TokenTypeEnum getTokenTypeEnum() {
-        return tokenTypeEnum;
-    }
-
-    public void setTokenTypeEnum(TokenTypeEnum tokenTypeEnum) {
-        this.tokenTypeEnum = tokenTypeEnum;
-    }
 
     public SeatStateEnum getMode() {
         return mode;

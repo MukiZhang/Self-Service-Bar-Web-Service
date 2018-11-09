@@ -30,11 +30,11 @@ public class SeatController {
         this.seatService = seatService;
     }
 
-    //该请求可能是用户调用  或者是管理员调用
+    //该请求是管理员调用
     @ApiOperation(value = "获取指定id的座位信息")
     @RequestMapping(path = "/{seatId}", method = RequestMethod.GET)
-    public Seat getSeatInfo(@PathVariable(value = "seatId") String seatId, @RequestParam(value = "token") String token, @RequestParam(value = "tokenType") TokenTypeEnum tokenTypeEnum) throws Exception {
-        return seatService.getBySeatId(seatId, token, tokenTypeEnum);
+    public Seat getSeatInfo(@PathVariable(value = "seatId") String seatId, @RequestParam(value = "token") String token) throws Exception {
+        return seatService.getBySeatId(seatId, token);
     }
 
     @ApiOperation(value = "添加新设备")
@@ -44,7 +44,7 @@ public class SeatController {
     }
 
     //todo  暂时不知道座位的控制方式，在更改状态时需要传递的参数
-    //该请求可能是用户调用  或者是管理员调用
+    //该请求是管理员调用
     @ApiOperation(value = "更改座位的状态")
     @RequestMapping(path = "/{seatId}", method = RequestMethod.PATCH)
     public Seat changeSeatState(@PathVariable(value = "seatId") String seatId, @RequestBody ChangeSeatRequest changeSeatRequest) throws Exception {

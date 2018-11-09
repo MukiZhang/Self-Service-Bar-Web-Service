@@ -27,11 +27,11 @@ public class MonitorController {
     }
 
 
-    //该请求可能是用户调用  或者是管理员调用
+    //该请求由管理员调用
     @ApiOperation(value = "获取指定id的监控信息")
     @RequestMapping(path = "/{monitorId}", method = RequestMethod.GET)
-    public Monitor getLightInfo(@PathVariable(value = "monitorId") String monitorId, @RequestParam(value = "token") String token, @RequestParam(value = "tokenType") TokenTypeEnum tokenTypeEnum) throws Exception {
-        return monitorService.getByMonitorId(monitorId, token, tokenTypeEnum);
+    public Monitor getMonitorInfo(@PathVariable(value = "monitorId") String monitorId, @RequestParam(value = "token") String token) throws Exception {
+        return monitorService.getByMonitorId(monitorId, token);
     }
 
     //该请求由管理员调用
@@ -48,7 +48,7 @@ public class MonitorController {
     }
 
     //todo  暂时不知道监控的控制方式，在更改状态时需要传递的参数
-    //该请求可能是用户调用  或者是管理员调用
+    //该请求是管理员调用
     @ApiOperation(value = "更改监控的状态")
     @RequestMapping(path = "/{monitorId}", method = RequestMethod.PATCH)
     public Monitor changeMonitorState(@PathVariable(value = "monitorId") String monitorId, @RequestBody ChangeMonitorRequest changeMonitorRequest) throws Exception {
