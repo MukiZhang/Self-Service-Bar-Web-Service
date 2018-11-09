@@ -17,4 +17,8 @@ public class ResponseMessage {
     public static final String INVALID_USER_TOKEN = "无效的token，请重新登陆";
     public static final String EXPIRED_USER_TOKEN = "token已过期，请重新登陆";
     public static final String ALREADY_LOGIN = "您已经在其它地点登陆，请重新登陆";
+
+    public static final String GET_SEAT_INFO_ERROR = "修改座位状态时发生错误";
+
+    public static final String GET_MONITOR_INFO_ERROR = "修改监控状态时发生错误";
 }

@@ -10,9 +10,6 @@ public class Table {
     @ApiModelProperty(value = "桌子id")
     private String id;
 
-    @ApiModelProperty(value = "店铺id")
-    private String bar_id;
-
     @ApiModelProperty(value = "左上角横坐标")
     private String left_up_x_coordinate;
 
@@ -41,14 +38,6 @@ public class Table {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getBar_id() {
-        return bar_id;
-    }
-
-    public void setBar_id(String bar_id) {
-        this.bar_id = bar_id;
     }
 
     public String getLeft_up_x_coordinate() {
