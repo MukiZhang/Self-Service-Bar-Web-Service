@@ -26,6 +26,9 @@ public class Seat {
     @ApiModelProperty(value = "桌子id")
     private String table_id;
 
+    @ApiModelProperty(value = "座位状态")
+    private String seatState;
+
     public String getId() {
         return id;
     }
@@ -61,5 +64,13 @@ public class Seat {
     public String getTable_id() { return table_id; }
 
     public void setTable_id(String table_id) { this.table_id = table_id; }
+
+    public String getSeatState() {
+        return seatState;
+    }
+
+    public void setSeatState(String seatState) {
+        this.seatState = seatState;
+    }
 }
 

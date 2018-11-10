@@ -14,10 +14,8 @@ public interface SeatMapper {
     @Select("SELECT id,ipAddress,hardwareId,position_x,position_y,table_id FROM seat_info WHERE id = #{seatId}")
     Seat getBySeatId(@Param("seatId") String seatId);
 
-    @Insert("INSERT INTO seat_info(id,ipAddress,hardwareId,position_x,position_y,table_id)" +
-            " VALUES(#{id}, #{ipAddress}, #{hardwareId}, #{position_x}, #{position_y}, #{table_id});")
+    @Insert("INSERT INTO seat_info(ipAddress,hardwareId,position_x,position_y,table_id)" +
+            " VALUES(#{ipAddress}, #{hardwareId}, #{position_x}, #{position_y}, #{table_id});")
     void createNewSeat(Seat seat);
 
-    @Select("SELECT MAX(id) FROM seat_info")
-    Integer findMaxId();
 }

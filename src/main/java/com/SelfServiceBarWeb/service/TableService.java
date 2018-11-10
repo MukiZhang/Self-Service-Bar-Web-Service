@@ -11,20 +11,20 @@ import java.util.List;
 @Service
 public class TableService {
     private final TableMapper tableMapper;
-    private final SeatMapper seatMapper;
     private final AdministratorService administratorService;
+    private final SeatService seatService;
 
     @Autowired
-    public TableService(TableMapper tableMapper, SeatMapper seatMapper, AdministratorService administratorService) {
+    public TableService(TableMapper tableMapper, AdministratorService administratorService, SeatService seatService) {
         this.tableMapper = tableMapper;
-        this.seatMapper = seatMapper;
         this.administratorService = administratorService;
+        this.seatService = seatService;
     }
 
     public List<Table> getAllTable(String token) throws Exception {
         List<Table> tables = tableMapper.getAll();
         for(Table table: tables) {
-            table.setSeats(seatMapper.getByTableId(table.getId()));
+            table.setSeats(seatService.getByTableId(table.getId()));
         }
         return tables;
     }

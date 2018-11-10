@@ -14,6 +14,9 @@ public class Monitor {
     @ApiModelProperty(value = "监控的硬件id")
     private String hardwareId;
 
+    @ApiModelProperty(value = "监控的状态")
+    private String monitorState;
+
     public String getId() {
         return id;
     }
@@ -36,5 +39,13 @@ public class Monitor {
 
     public void setHardwareId(String hardwareId) {
         this.hardwareId = hardwareId;
+    }
+
+    public String getMonitorState() {
+        return monitorState;
+    }
+
+    public void setMonitorState(String monitorState) {
+        this.monitorState = monitorState;
     }
 }

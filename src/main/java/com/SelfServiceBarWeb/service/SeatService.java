@@ -7,6 +7,7 @@ import com.SelfServiceBarWeb.model.Seat;
 import com.SelfServiceBarWeb.model.SelfServiceBarWebException;
 import com.SelfServiceBarWeb.model.request.ChangeSeatRequest;
 import com.SelfServiceBarWeb.model.request.CreateSeatRequest;
+import com.SelfServiceBarWeb.model.request.SeatStateEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,14 +26,19 @@ public class SeatService {
         this.seatMapper = seatMapper;
     }
 
-    public List<Seat> getByTableId(String tableId, String token) throws Exception {
+    public List<Seat> getByTableId(String tableId) throws Exception {
         List<Seat> seats = seatMapper.getByTableId(tableId);
+        for (Seat seat : seats) {
+            seat.setSeatState("获取中");
+        }
         return seats;
     }
 
     public Seat getBySeatId(String seatId, String token) throws Exception {
         //验证token，用户或者管理员
         Seat seat = seatMapper.getBySeatId(seatId);
+        seat.setSeatState("获取中");
+
         if (seat == null)
             throw new SelfServiceBarWebException(400, ResponseMessage.ERROR, ResponseMessage.GET_SEAT_INFO_ERROR);
         return seat;
@@ -42,12 +48,12 @@ public class SeatService {
         //createSeatRequest.getLoginToken();
 
         Seat seat = new Seat();
-        seat.setId(String.valueOf(seatMapper.findMaxId() + 1));
         seat.setHardwareId(createSeatRequest.getHardwareId());
         seat.setIpAddress(createSeatRequest.getIpAddress());
         seat.setTable_id(createSeatRequest.getTable_id());
         seat.setPosition_x(createSeatRequest.getPosition_x());
         seat.setPosition_y(createSeatRequest.getPosition_y());
+        seat.setSeatState("获取中");
 
         seatMapper.createNewSeat(seat);
         return seat;
@@ -58,6 +64,7 @@ public class SeatService {
         if (seat == null)
             throw new SelfServiceBarWebException(400, ResponseMessage.ERROR, ResponseMessage.GET_SEAT_INFO_ERROR);
         //修改seat状态
+        seat.setSeatState(changeSeatRequest.getMode().getValue() + "");
         return seat;
     }
 }

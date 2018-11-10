@@ -14,10 +14,7 @@ public interface MonitorMapper {
     @Select("SELECT id,ipAddress,hardwareId FROM monitor_info WHERE id = #{monitorId}")
     Monitor getByMonitorId(@Param("monitorId") String monitorId);
 
-    @Insert("INSERT INTO monitor_info(id,ipAddress,hardwareId)" +
-            " VALUES(#{id}, #{ipAddress}, #{hardwareId});")
+    @Insert("INSERT INTO monitor_info(ipAddress,hardwareId)" +
+            " VALUES(#{ipAddress}, #{hardwareId});")
     void createNewMonitor(Monitor monitor);
-
-    @Select("SELECT MAX(id) FROM monitor_info")
-    Integer findMaxId();
 }

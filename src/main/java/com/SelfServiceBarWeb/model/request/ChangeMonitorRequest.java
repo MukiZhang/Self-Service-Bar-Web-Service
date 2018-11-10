@@ -4,16 +4,16 @@ import io.swagger.annotations.ApiModelProperty;
 
 public class ChangeMonitorRequest {
     @ApiModelProperty(value = "更改模式：开、关")
-    private SeatStateEnum mode;
+    private MonitorStateEnum mode;
 
     @ApiModelProperty(value = "token")
     private String token;
 
-    public SeatStateEnum getMode() {
+    public MonitorStateEnum getMode() {
         return mode;
     }
 
-    public void setMode(SeatStateEnum mode) {
+    public void setMode(MonitorStateEnum mode) {
         this.mode = mode;
     }
 
