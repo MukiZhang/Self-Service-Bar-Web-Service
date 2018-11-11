@@ -24,7 +24,7 @@ public class MonitorService {
     public List<Monitor> getAllMonitors(String token) throws Exception {
         List<Monitor> monitors = monitorMapper.getAll();
         for (Monitor monitor : monitors) {
-            monitor.setMonitorState("获取中");
+            monitor.setState("获取中");
         }
 
         return monitors;
@@ -33,19 +33,20 @@ public class MonitorService {
     public Monitor getByMonitorId(String monitorId, String token) throws Exception {
         //验证token，用户或者管理员
         Monitor monitor = monitorMapper.getByMonitorId(monitorId);
-        monitor.setMonitorState("获取中");
+        monitor.setState("获取中");
 
         if (monitor == null)
             throw new SelfServiceBarWebException(400, ResponseMessage.ERROR, ResponseMessage.GET_MONITOR_INFO_ERROR);
         return monitor;
     }
 
-    public Monitor createNewSeat(CreateMonitorRequest createMonitorRequest) {
+    public Monitor createNewMonitor(CreateMonitorRequest createMonitorRequest) {
 
         Monitor monitor = new Monitor();
         monitor.setHardwareId(createMonitorRequest.getHardwareId());
         monitor.setIpAddress(createMonitorRequest.getIpAddress());
-        monitor.setMonitorState("获取中");
+        monitor.setState("获取中");
+        monitor.setLocation(createMonitorRequest.getLocation());
 
         monitorMapper.createNewMonitor(monitor);
         return monitor;
@@ -57,7 +58,7 @@ public class MonitorService {
             throw new SelfServiceBarWebException(400, ResponseMessage.ERROR, ResponseMessage.GET_MONITOR_INFO_ERROR);
         //修改monitor状态
 
-        monitor.setMonitorState(changeMonitorRequest.getMode().getValue() + "");
+        monitor.setState(changeMonitorRequest.getMode().getValue() + "");
         return monitor;
     }
 }

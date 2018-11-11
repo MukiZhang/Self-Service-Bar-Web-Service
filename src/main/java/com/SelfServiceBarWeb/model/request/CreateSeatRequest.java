@@ -15,6 +15,9 @@ public class CreateSeatRequest {
     @ApiModelProperty(value = "座位的纵坐标")
     private String position_y;
 
+    @ApiModelProperty(value = "座位的位置")
+    private String location;
+
     @ApiModelProperty(value = "座位的桌子id")
     private String table_id;
 
@@ -43,6 +46,14 @@ public class CreateSeatRequest {
 
     public void setLoginToken(String loginToken) {
         this.loginToken = loginToken;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     public String getTable_id() {

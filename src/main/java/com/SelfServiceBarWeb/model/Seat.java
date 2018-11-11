@@ -27,7 +27,10 @@ public class Seat {
     private String table_id;
 
     @ApiModelProperty(value = "座位状态")
-    private String seatState;
+    private String state;
+
+    @ApiModelProperty(value = "座位位置描述")
+    private String location;
 
     public String getId() {
         return id;
@@ -65,12 +68,20 @@ public class Seat {
 
     public void setTable_id(String table_id) { this.table_id = table_id; }
 
-    public String getSeatState() {
-        return seatState;
+    public String getState() {
+        return state;
     }
 
-    public void setSeatState(String seatState) {
-        this.seatState = seatState;
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 }
 
