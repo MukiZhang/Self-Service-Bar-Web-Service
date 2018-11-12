@@ -1,6 +1,7 @@
 package com.SelfServiceBarWeb.mapper;
 
 import com.SelfServiceBarWeb.model.Hardware;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -30,4 +31,8 @@ public interface HardwareStateMapper {
 
     @Update("UPDATE hardware_state SET brightness = brightness-1 WHERE hardware_id=#{id} AND type=#{type} AND brightness>0;")
     int decreaseBrightnessByIdAndType(@Param("id") String id, @Param("type") Integer type);
+
+    @Insert("INSERT INTO hardware_state(hardware_id,type)" +
+            " VALUES(#{hardware_id}, #{type});")
+    void createNewHardwareState(Hardware hardware);
 }
