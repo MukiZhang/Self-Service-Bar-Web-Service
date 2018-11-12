@@ -12,7 +12,10 @@ public class Entrance {
     private String id;
 
     @ApiModelProperty(value = "ip地址")
-    private String ipAddress;
+    private String ip_address;
+
+    @ApiModelProperty(value = "无人吧id")
+    private String bar_id;
 
     @ApiModelProperty(value = "设备控制token")
     private String token;
@@ -33,11 +36,19 @@ public class Entrance {
         this.id = id;
     }
 
-    public String getIpAddress() {
-        return ipAddress;
+    public String getIp_address() {
+        return ip_address;
     }
 
-    public void setIpAddress(String ipAddress) {
-        this.ipAddress = ipAddress;
+    public void setIp_address(String ip_address) {
+        this.ip_address = ip_address;
+    }
+
+    public String getBar_id() {
+        return bar_id;
+    }
+
+    public void setBar_id(String bar_id) {
+        this.bar_id = bar_id;
     }
 }

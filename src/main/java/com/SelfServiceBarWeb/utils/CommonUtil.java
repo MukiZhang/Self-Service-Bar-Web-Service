@@ -10,6 +10,7 @@ import java.util.Date;
  * Created by Muki on 2018/11/5
  */
 public class CommonUtil {
+    //加密
     public static <T> String createJWT(T content, String secret, Date createTime, Date expireTime) throws Exception {
         //HMAC
         Algorithm algorithm = Algorithm.HMAC256(secret);
