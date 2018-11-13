@@ -37,8 +37,14 @@ public class SeatController {
         return seatService.getBySeatId(seatId, token);
     }
 
+    @ApiOperation(value = "获取所有桌椅信息")
+    @RequestMapping(path = "/all", method = RequestMethod.GET)
+    public List<Seat> getAllTable(@RequestParam(value = "token") String token) throws Exception {
+        return seatService.getAllSeats(token);
+    }
+
     @ApiOperation(value = "添加新设备")
-    @RequestMapping(path = "", method = RequestMethod.POST)
+    @RequestMapping(path = "/create", method = RequestMethod.POST)
     public Seat createNewSeat(@RequestBody CreateSeatRequest createSeatRequest) throws Exception {
         return seatService.createNewSeat(createSeatRequest);
     }

@@ -1,15 +1,13 @@
 package com.SelfServiceBarWeb.controller;
 
 import com.SelfServiceBarWeb.model.Table;
+import com.SelfServiceBarWeb.model.request.CreateTableRequest;
 import com.SelfServiceBarWeb.service.TableService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -31,5 +29,9 @@ public class TableController {
         return tableService.getAllTable(token);
     }
 
-
+    @ApiOperation(value = "添加新设备")
+    @RequestMapping(path = "/create", method = RequestMethod.POST)
+    public Table createNewTable(@RequestBody CreateTableRequest createTableRequest) throws Exception {
+        return tableService.createNewTable(createTableRequest);
+    }
 }

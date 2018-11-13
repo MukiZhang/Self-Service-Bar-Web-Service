@@ -42,9 +42,9 @@ public class MonitorController {
     }
 
     @ApiOperation(value = "添加新设备")
-    @RequestMapping(path = "", method = RequestMethod.POST)
+    @RequestMapping(path = "/create", method = RequestMethod.POST)
     public Monitor createNewMonitor(@RequestBody CreateMonitorRequest createMonitorRequest) throws Exception {
-        return monitorService.createNewSeat(createMonitorRequest);
+        return monitorService.createNewMonitor(createMonitorRequest);
     }
 
     //todo  暂时不知道监控的控制方式，在更改状态时需要传递的参数
