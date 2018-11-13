@@ -4,6 +4,7 @@ import com.SelfServiceBarWeb.constant.ResponseMessage;
 import com.SelfServiceBarWeb.mapper.AdministratorMapper;
 import com.SelfServiceBarWeb.mapper.HardwareStateMapper;
 import com.SelfServiceBarWeb.mapper.LightMapper;
+import com.SelfServiceBarWeb.mapper.OrderMapper;
 import com.SelfServiceBarWeb.model.*;
 import com.SelfServiceBarWeb.model.request.ChangeLightRequest;
 import com.SelfServiceBarWeb.model.request.CreateLightRequest;
@@ -14,6 +15,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -27,13 +29,15 @@ public class LightService {
     private final HardwareStateMapper hardwareStateMapper;
     private final AdministratorService administratorService;
     private final AdministratorMapper administratorMapper;
+    private final OrderMapper orderMapper;
 
     @Autowired
-    public LightService(LightMapper lightMapper, AdministratorService administratorService, HardwareStateMapper hardwareStateMapper, AdministratorMapper administratorMapper) {
+    public LightService(LightMapper lightMapper, AdministratorService administratorService, HardwareStateMapper hardwareStateMapper, AdministratorMapper administratorMapper, OrderMapper orderMapper) {
         this.lightMapper = lightMapper;
         this.administratorService = administratorService;
         this.hardwareStateMapper = hardwareStateMapper;
         this.administratorMapper = administratorMapper;
+        this.orderMapper = orderMapper;
     }
 
     public Light getLightInfo(String lightId, String token, TokenTypeEnum tokenTypeEnum) throws Exception {
@@ -126,5 +130,26 @@ public class LightService {
         light.setState(HardwareStateEnum.getHardwareStateEnum(lightState.getState()));
         light.setLuminance(lightState.getLuminance());
         return light;
+    }
+
+    public List<Light> getLightInfoByOrderNo(String token) throws Exception {
+        //token解析
+        DecodedJWT jwt = CommonUtil.phraseJWT(token, "userControlToken", ResponseMessage.INVALID_CONTROL_TOKEN);
+
+        String orderNo = JSONObject.parseObject(jwt.getSubject()).getString("orderNo");
+        Order order = orderMapper.getOrderByOrderNoAndStatus(orderNo);
+        if (order == null)
+            throw new SelfServiceBarWebException(404, ResponseMessage.ERROR, ResponseMessage.ORDER_NOT_NOT_FOUND);
+
+        String barId = JSONObject.parseObject(jwt.getSubject()).getString("barId");
+        if (!Objects.equals(barId, order.getBar_id()))
+            throw new SelfServiceBarWebException(403, ResponseMessage.ERROR, ResponseMessage.INVALID_CONTROL_TOKEN);
+
+        //返回座位id对应的灯id
+        List<Light> lights = new ArrayList<>();
+        String[] seatIds = order.getSeat_ids().split("\\+");
+        for (String seatId : seatIds)
+            lights.add(lightMapper.getLightBySeatId(seatId));
+        return lights;
     }
 }

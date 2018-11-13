@@ -57,4 +57,10 @@ public class LightController {
     public Light changeLightState(@PathVariable(value = "lightId") String lightId, @RequestBody ChangeLightRequest changeLightRequest) throws Exception {
         return lightService.changeLightState(lightId, changeLightRequest);
     }
+
+    @ApiOperation(value = "获取指定订单编号对应的灯光信息")
+    @RequestMapping(path = "", method = RequestMethod.GET)
+    public List<Light> getLightInfoByOrderNo(@RequestParam(value = "token") String token) throws Exception {
+        return lightService.getLightInfoByOrderNo(token);
+    }
 }

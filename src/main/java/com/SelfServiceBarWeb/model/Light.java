@@ -35,6 +35,10 @@ public class Light {
         this.seat_id = seat_id;
     }
 
+    public Light() {
+
+    }
+
     public HardwareStateEnum getState() {
         return state;
     }

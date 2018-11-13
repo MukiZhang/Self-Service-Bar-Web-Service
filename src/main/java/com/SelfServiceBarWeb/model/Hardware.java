@@ -23,6 +23,10 @@ public class Hardware {
         this.type = type;
     }
 
+    public Hardware() {
+
+    }
+
     public String getDevice_id() {
         return device_id;
     }

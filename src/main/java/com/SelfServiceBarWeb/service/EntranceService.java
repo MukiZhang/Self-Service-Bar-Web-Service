@@ -12,10 +12,6 @@ import com.SelfServiceBarWeb.model.SelfServiceBarWebException;
 import com.SelfServiceBarWeb.model.request.EntranceStateEnum;
 import com.SelfServiceBarWeb.utils.CommonUtil;
 import com.alibaba.fastjson.JSONObject;
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -50,23 +46,22 @@ public class EntranceService {
     }
 
     //进门二维码的验证
-    public Entrance QRContentVerify(String QRCodeContent) throws Exception {
+    public void QRContentVerify(String QRCodeContent) throws Exception {
         JSONObject jsonObject = JSONObject.parseObject(QRCodeContent);
         String orderNo = jsonObject.getString("orderNo");
         Order order = orderMapper.getOrderByOrderNoAndStatus(orderNo);
         if (order == null)
             throw new SelfServiceBarWebException(404, ResponseMessage.ERROR, ResponseMessage.ORDER_NOT_NOT_FOUND);
-        Date now = new Date();
         DecodedJWT jwt = CommonUtil.phraseJWT(jsonObject.getString("content"), order.getOrder_key(), ResponseMessage.INVALID_ORDER_TOKEN);
-        if (jwt.getExpiresAt().getTime() < now.getTime())
-            throw new SelfServiceBarWebException(403, ResponseMessage.ERROR, ResponseMessage.EXPIRED_USER_TOKEN);
+
         JSONObject tokenJsonObject = JSONObject.parseObject(jwt.getSubject());
         String userId = tokenJsonObject.getString("uid");
         String orderNoInToken = tokenJsonObject.getString("orderNo");
         //验证token内容是否正确
         if (userId == null || orderNoInToken == null || !userId.equals(order.getUser_id()) || !orderNoInToken.equals(orderNo))
             throw new SelfServiceBarWebException(500, ResponseMessage.ERROR, ResponseMessage.INNER_SERVER_ERROR);
-
+        //更新订单验证成功标志，之后根据这个字段是否为1返回门禁信息
+        orderMapper.updateVerify(order.getId());
         //将该订单的准入人数减一
         int updateRes = orderMapper.updateAdmission(order.getId());
         //验证准入限制
@@ -79,7 +74,7 @@ public class EntranceService {
                 || !(nowHour <= order.getEnd_hour()))
             throw new SelfServiceBarWebException(400, ResponseMessage.ERROR, ResponseMessage.ERROR_ENTER_TIME);
 
-        Entrance entrance = entranceMapper.getEntranceInfo();
+        /*Entrance entrance = entranceMapper.getEntranceInfo();
 
         //采用jwt获得token
         Date createTime = new Date();
@@ -89,7 +84,7 @@ public class EntranceService {
         content.put("uid", userId);
         content.put("barId", entrance.getBar_id());
         String token = CommonUtil.createJWT(content, "userControlToken", createTime, expireTime);
-        entrance.setToken(token);
+        entrance.setToken(token);*/
 
         //设备状态变更
         //灯 座位
@@ -98,13 +93,30 @@ public class EntranceService {
             hardwareStateMapper.openByIdAndType(seatId, HardwareTypeEnum.seat.getValue());
             hardwareStateMapper.openByIdAndType(lightMapper.getLightIdBySeatId(seatId), HardwareTypeEnum.light.getValue());
         }
-        return entrance;
     }
 
     public Entrance getEntranceInfo(String token) throws Exception {
         administratorService.getAdministratorIdFromToken(token);
         return entranceMapper.getEntranceInfo();
     }
+
+    public String getDeviceControlToken(String orderNo) throws Exception {
+        Entrance entrance = entranceMapper.getEntranceInfo();
+        Order order = orderMapper.getOrderByOrderNoAndStatus(orderNo);
+        if (order == null)
+            throw new SelfServiceBarWebException(404, ResponseMessage.ERROR, ResponseMessage.ORDER_NOT_NOT_FOUND);
+
+        //采用jwt获得token
+        Date createTime = new Date();
+        //过期时间应为订单所选时间到时时间
+        Date expireTime = mysqlSdf.parse(order.getScheduled_day() + " " + order.getEnd_hour() + ":00:00");
+        Map<String, String> content = new HashMap<>();
+        content.put("uid", order.getUser_id());
+        content.put("barId", entrance.getBar_id());
+        content.put("orderNo", orderNo);
+        return CommonUtil.createJWT(content, "userControlToken", createTime, expireTime);
+    }
+
 
     public Entrance changeEntranceState(String token, EntranceStateEnum entranceStateEnum) throws Exception {
         Entrance entrance = entranceMapper.getEntranceInfo();

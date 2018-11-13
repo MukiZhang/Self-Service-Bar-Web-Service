@@ -34,6 +34,13 @@ public class EntranceController {
         return entranceService.getEntranceInfo(token);
     }
 
+    //由用户调用
+    @ApiOperation(value = "获取无人吧内部设备控制token")
+    @RequestMapping(path = "/deviceControlToken", method = RequestMethod.GET)
+    public String getDeviceControlToken(@RequestParam(value = "orderNo") String orderNo) throws Exception {
+        return entranceService.getDeviceControlToken(orderNo);
+    }
+
     //由管理员调用
     @ApiOperation(value = "更改门禁状态")
     @RequestMapping(path = "/", method = RequestMethod.PATCH)
@@ -41,12 +48,12 @@ public class EntranceController {
         return entranceService.changeEntranceState(token, entranceStateEnum);
     }
 
-    //由用户调用
+    //由门禁调用
     @ApiOperation(value = "验证进门、出门二维码")
     @RequestMapping(path = "/verification", method = RequestMethod.POST)
-    public Entrance QRContentVerify(@RequestBody String QRCodeContent) throws Exception {
+    public void QRContentVerify(@RequestBody String QRCodeContent) throws Exception {
         //该请求应当是门禁向主控电脑后台发出的请求，故请求只携带二维码字符串内容
         //todo 未完成出门的验证
-        return entranceService.QRContentVerify(QRCodeContent);
+        entranceService.QRContentVerify(QRCodeContent);
     }
 }
