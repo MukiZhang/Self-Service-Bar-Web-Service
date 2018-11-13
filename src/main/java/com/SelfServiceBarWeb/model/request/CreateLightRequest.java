@@ -12,8 +12,30 @@ public class CreateLightRequest {
     @ApiModelProperty(value = "灯的硬件id")
     private String hardwareId;
 
+    @ApiModelProperty(value = "所属座位id")
+    private String seatId;
+
+    @ApiModelProperty(value = "所属无人吧id")
+    private String barId;
+
     @ApiModelProperty(value = "管理员登录token")
     private String loginToken;
+
+    public String getSeatId() {
+        return seatId;
+    }
+
+    public void setSeatId(String seatId) {
+        this.seatId = seatId;
+    }
+
+    public String getBarId() {
+        return barId;
+    }
+
+    public void setBarId(String barId) {
+        this.barId = barId;
+    }
 
     public String getIpAddress() {
         return ipAddress;
