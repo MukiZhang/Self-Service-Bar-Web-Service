@@ -5,7 +5,6 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
-import java.math.BigInteger;
 
 
 /**
@@ -17,4 +16,7 @@ public interface OrderMapper {
 
     @Update("UPDATE order_info SET admission = admission - 1 WHERE id = #{id} AND admission >= 1;")
     int updateAdmission(@Param("id") String orderId);
+
+    @Update("UPDATE order_info SET verify = 1 WHERE id = #{id};")
+    int updateVerify(@Param("id") String orderId);
 }

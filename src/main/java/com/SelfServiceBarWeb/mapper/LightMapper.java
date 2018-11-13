@@ -15,6 +15,9 @@ public interface LightMapper {
     @Select("SELECT id FROM light_info WHERE seat_id=#{seatId};")
     String getLightIdBySeatId(@Param("seatId") String seatId);
 
+    @Select("SELECT * FROM light_info WHERE seat_id=#{seatId};")
+    Light getLightBySeatId(@Param("seatId") String seatId);
+
     @Select("SELECT * FROM light_info WHERE id=#{id};")
     Light getById(@Param("id") String id);
 
