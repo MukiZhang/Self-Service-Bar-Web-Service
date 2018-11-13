@@ -26,4 +26,6 @@ public class ResponseMessage {
     public static final String ORDER_NOT_NOT_FOUND = "找不到符合条件的订单";
     public static final String EXCEED_ADMISSION_LIMIT = "超过准入人数限制";
     public static final String ERROR_ENTER_TIME = "进门时间不在预定时间内";
+    public static final String INVALID_CONTROL_TOKEN = "无效的设备控制token，验证失败";
+    public static final String LIGHT_NOT_NOT_FOUND = "找不到灯信息";
 }

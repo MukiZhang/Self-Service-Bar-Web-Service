@@ -62,21 +62,11 @@ public class AdministratorService {
         administratorMapper.updateTokenCreateTimeById(null, administratorId);
     }
 
-    private String getAdministratorIdFromToken(String token) throws Exception {
+    public String getAdministratorIdFromToken(String token) throws Exception {
         if (Objects.equals(token, "noToken"))
             throw new SelfServiceBarWebException(403, ResponseMessage.ERROR, ResponseMessage.DO_NOT_LOGIN);
-        Algorithm algorithm = Algorithm.HMAC256("selfServiceWeb");
-        DecodedJWT jwt;
         Date now = new Date();
-        try {
-            JWTVerifier verifier = JWT.require(algorithm)
-                    .withIssuer("auth0")
-                    .build(); //Reusable verifier instance
-            jwt = verifier.verify(token);
-        } catch (JWTVerificationException exception) {
-            //无效签名或者无效token
-            throw new SelfServiceBarWebException(403, ResponseMessage.ERROR, ResponseMessage.INVALID_USER_TOKEN);
-        }
+        DecodedJWT jwt = CommonUtil.phraseJWT(token, "selfServiceWeb", ResponseMessage.INVALID_USER_TOKEN);
         String userId = JSONObject.parseObject(jwt.getSubject()).getString("uid");
         String tokenCreateTime = administratorMapper.getTokenCreateTime(userId);
         //数据库中token创建时间字段为空，说明用户已经注销登陆
