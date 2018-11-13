@@ -2,10 +2,14 @@ package com.SelfServiceBarWeb.service;
 
 import com.SelfServiceBarWeb.constant.ResponseMessage;
 import com.SelfServiceBarWeb.mapper.EntranceMapper;
+import com.SelfServiceBarWeb.mapper.HardwareStateMapper;
+import com.SelfServiceBarWeb.mapper.LightMapper;
 import com.SelfServiceBarWeb.mapper.OrderMapper;
 import com.SelfServiceBarWeb.model.Entrance;
+import com.SelfServiceBarWeb.model.HardwareTypeEnum;
 import com.SelfServiceBarWeb.model.Order;
 import com.SelfServiceBarWeb.model.SelfServiceBarWebException;
+import com.SelfServiceBarWeb.model.request.EntranceStateEnum;
 import com.SelfServiceBarWeb.utils.CommonUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.auth0.jwt.JWT;
@@ -29,14 +33,20 @@ import java.util.Map;
 public class EntranceService {
     private final EntranceMapper entranceMapper;
     private final OrderMapper orderMapper;
+    private final HardwareStateMapper hardwareStateMapper;
+    private final LightMapper lightMapper;
+    private final AdministratorService administratorService;
 
     private static final SimpleDateFormat mysqlSdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final SimpleDateFormat scheduledDaySdf = new SimpleDateFormat("yyyy-MM-dd");
 
     @Autowired
-    public EntranceService(EntranceMapper entranceMapper, OrderMapper orderMapper) {
+    public EntranceService(EntranceMapper entranceMapper, OrderMapper orderMapper, HardwareStateMapper hardwareStateMapper, LightMapper lightMapper, AdministratorService administratorService) {
         this.entranceMapper = entranceMapper;
         this.orderMapper = orderMapper;
+        this.hardwareStateMapper = hardwareStateMapper;
+        this.lightMapper = lightMapper;
+        this.administratorService = administratorService;
     }
 
     //进门二维码的验证
@@ -46,26 +56,15 @@ public class EntranceService {
         Order order = orderMapper.getOrderByOrderNoAndStatus(orderNo);
         if (order == null)
             throw new SelfServiceBarWebException(404, ResponseMessage.ERROR, ResponseMessage.ORDER_NOT_NOT_FOUND);
-
-        Algorithm algorithm = Algorithm.HMAC256(order.getOrder_key());
-        DecodedJWT jwt;
         Date now = new Date();
-        try {
-            JWTVerifier verifier = JWT.require(algorithm)
-                    .withIssuer("auth0")
-                    .build(); //Reusable verifier instance
-            jwt = verifier.verify(QRCodeContent);
-        } catch (JWTVerificationException exception) {
-            //无效签名或者无效token
-            throw new SelfServiceBarWebException(403, ResponseMessage.ERROR, ResponseMessage.INVALID_ORDER_TOKEN);
-        }
+        DecodedJWT jwt = CommonUtil.phraseJWT(jsonObject.getString("content"), order.getOrder_key(), ResponseMessage.INVALID_ORDER_TOKEN);
         if (jwt.getExpiresAt().getTime() < now.getTime())
             throw new SelfServiceBarWebException(403, ResponseMessage.ERROR, ResponseMessage.EXPIRED_USER_TOKEN);
         JSONObject tokenJsonObject = JSONObject.parseObject(jwt.getSubject());
         String userId = tokenJsonObject.getString("uid");
         String orderNoInToken = tokenJsonObject.getString("orderNo");
         //验证token内容是否正确
-        if (!userId.equals(order.getUser_id()) || !orderNoInToken.equals(orderNo))
+        if (userId == null || orderNoInToken == null || !userId.equals(order.getUser_id()) || !orderNoInToken.equals(orderNo))
             throw new SelfServiceBarWebException(500, ResponseMessage.ERROR, ResponseMessage.INNER_SERVER_ERROR);
 
         //将该订单的准入人数减一
@@ -89,8 +88,37 @@ public class EntranceService {
         Map<String, String> content = new HashMap<>();
         content.put("uid", userId);
         content.put("barId", entrance.getBar_id());
-        String token = CommonUtil.createJWT(content, "selfServiceWeb", createTime, expireTime);
+        String token = CommonUtil.createJWT(content, "userControlToken", createTime, expireTime);
         entrance.setToken(token);
+
+        //设备状态变更
+        //灯 座位
+        String[] seatIds = order.getSeat_ids().split("\\+");
+        for (String seatId : seatIds) {
+            hardwareStateMapper.openByIdAndType(seatId, HardwareTypeEnum.seat.getValue());
+            hardwareStateMapper.openByIdAndType(lightMapper.getLightIdBySeatId(seatId), HardwareTypeEnum.light.getValue());
+        }
+        return entrance;
+    }
+
+    public Entrance getEntranceInfo(String token) throws Exception {
+        administratorService.getAdministratorIdFromToken(token);
+        return entranceMapper.getEntranceInfo();
+    }
+
+    public Entrance changeEntranceState(String token, EntranceStateEnum entranceStateEnum) throws Exception {
+        Entrance entrance = entranceMapper.getEntranceInfo();
+        administratorService.getAdministratorIdFromToken(token);
+        switch (entranceStateEnum) {
+            case open: {
+                hardwareStateMapper.openByIdAndType(entrance.getId(), HardwareTypeEnum.entrance.getValue());
+                break;
+            }
+            case close: {
+                hardwareStateMapper.closeByIdAndType(entrance.getId(), HardwareTypeEnum.entrance.getValue());
+                break;
+            }
+        }
         return entrance;
     }
 }
