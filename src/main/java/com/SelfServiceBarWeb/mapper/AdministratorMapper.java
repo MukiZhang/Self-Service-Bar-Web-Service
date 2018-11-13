@@ -20,4 +20,7 @@ public interface AdministratorMapper {
 
     @Select("SELECT token_create_at FROM administrator_info WHERE id =#{id};")
     String getTokenCreateTime(@Param("id") String id);
+
+    @Select("SELECT bar_id FROM administrator_info WHERE id =#{id};")
+    String getBarId(@Param("id") String id);
 }

@@ -7,7 +7,7 @@ import io.swagger.annotations.ApiModelProperty;
  */
 public class Hardware {
     @ApiModelProperty(value = "设备id")
-    private String hardware_id;
+    private String device_id;
 
     @ApiModelProperty(value = "设备类型")
     private Integer type;
@@ -16,14 +16,19 @@ public class Hardware {
     private Integer state;
 
     @ApiModelProperty(value = "灯光亮度")
-    private Integer brightness;
+    private Integer luminance;
 
-    public String getHardware_id() {
-        return hardware_id;
+    public Hardware(String device_id, Integer type) {
+        this.device_id = device_id;
+        this.type = type;
     }
 
-    public void setHardware_id(String hardware_id) {
-        this.hardware_id = hardware_id;
+    public String getDevice_id() {
+        return device_id;
+    }
+
+    public void setDevice_id(String device_id) {
+        this.device_id = device_id;
     }
 
     public Integer getType() {
@@ -42,11 +47,11 @@ public class Hardware {
         this.state = state;
     }
 
-    public Integer getBrightness() {
-        return brightness;
+    public Integer getLuminance() {
+        return luminance;
     }
 
-    public void setBrightness(Integer brightness) {
-        this.brightness = brightness;
+    public void setLuminance(Integer luminance) {
+        this.luminance = luminance;
     }
 }
