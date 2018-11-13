@@ -75,7 +75,7 @@ public class LightService {
         Light light = new Light(createLightRequest.getIpAddress(), createLightRequest.getHardwareId(), createLightRequest.getSeatId());
         light.setBar_id(administratorMapper.getBarId(administratorId));
         lightMapper.createNewLight(light);
-        Hardware hardware = new Hardware(light.getHardware_id(), HardwareTypeEnum.light.getValue());
+        Hardware hardware = new Hardware(light.getId(), HardwareTypeEnum.light.getValue());
         hardwareStateMapper.createNewHardwareState(hardware);
         return light;
     }
