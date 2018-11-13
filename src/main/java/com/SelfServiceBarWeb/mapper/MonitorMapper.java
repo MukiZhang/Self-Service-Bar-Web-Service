@@ -11,13 +11,10 @@ public interface MonitorMapper {
     @Select("SELECT * FROM monitor_info")
     List<Monitor> getAll();
 
-    @Select("SELECT id,ipAddress,hardwareId FROM monitor_info WHERE id = #{monitorId}")
+    @Select("SELECT * FROM monitor_info WHERE id = #{monitorId}")
     Monitor getByMonitorId(@Param("monitorId") String monitorId);
 
-    @Insert("INSERT INTO monitor_info(id,ipAddress,hardwareId)" +
-            " VALUES(#{id}, #{ipAddress}, #{hardwareId});")
+    @Insert("INSERT INTO monitor_info(ipAddress,hardwareId, location)" +
+            " VALUES(#{ipAddress}, #{hardwareId}, #{location});")
     void createNewMonitor(Monitor monitor);
-
-    @Select("SELECT MAX(id) FROM monitor_info")
-    Integer findMaxId();
 }

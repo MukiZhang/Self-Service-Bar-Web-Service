@@ -1,14 +1,11 @@
-package com.SelfServiceBarWeb.model;
+package com.SelfServiceBarWeb.model.request;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModelProperty;
 
-import java.util.List;
+public class CreateTableRequest {
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class Table {
-    @ApiModelProperty(value = "桌子id")
-    private String id;
+    @ApiModelProperty(value = "管理员登录token")
+    private String loginToken;
 
     @ApiModelProperty(value = "桌子位置")
     private String location;
@@ -25,12 +22,20 @@ public class Table {
     @ApiModelProperty(value = "右下角纵坐标")
     private String right_down_y_coordinate;
 
-    public String getId() {
-        return id;
+    public String getLoginToken() {
+        return loginToken;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setLoginToken(String loginToken) {
+        this.loginToken = loginToken;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     public String getLeft_up_x_coordinate() {
@@ -63,13 +68,5 @@ public class Table {
 
     public void setRight_down_y_coordinate(String right_down_y_coordinate) {
         this.right_down_y_coordinate = right_down_y_coordinate;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
     }
 }

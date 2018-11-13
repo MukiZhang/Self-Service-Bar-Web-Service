@@ -9,8 +9,19 @@ public class CreateMonitorRequest {
     @ApiModelProperty(value = "监控的硬件id")
     private String hardwareId;
 
+    @ApiModelProperty(value = "监控的位置")
+    private String location;
+
     @ApiModelProperty(value = "管理员登录token")
     private String loginToken;
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
 
     public String getIpAddress() {
         return ipAddress;

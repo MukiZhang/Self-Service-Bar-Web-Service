@@ -8,16 +8,17 @@ import org.apache.ibatis.annotations.Select;
 import java.util.List;
 
 public interface SeatMapper {
-    @Select("SELECT id,ipAddress,hardwareId,position_x,position_y,table_id FROM seat_info WHERE table_id = #{tableId}")
+    @Select("SELECT * FROM seat_info")
+    List<Seat> getAllSeats();
+
+    @Select("SELECT * FROM seat_info WHERE table_id = #{tableId}")
     List<Seat> getByTableId(@Param("tableId") String tableId);
 
-    @Select("SELECT id,ipAddress,hardwareId,position_x,position_y,table_id FROM seat_info WHERE id = #{seatId}")
+    @Select("SELECT * FROM seat_info WHERE id = #{seatId}")
     Seat getBySeatId(@Param("seatId") String seatId);
 
-    @Insert("INSERT INTO seat_info(id,ipAddress,hardwareId,position_x,position_y,table_id)" +
-            " VALUES(#{id}, #{ipAddress}, #{hardwareId}, #{position_x}, #{position_y}, #{table_id});")
+    @Insert("INSERT INTO seat_info(ipAddress,hardwareId,position_x,position_y, location,table_id)" +
+            " VALUES(#{ipAddress}, #{hardwareId}, #{position_x}, #{position_y}, #{location}, #{table_id});")
     void createNewSeat(Seat seat);
 
-    @Select("SELECT MAX(id) FROM seat_info")
-    Integer findMaxId();
 }
