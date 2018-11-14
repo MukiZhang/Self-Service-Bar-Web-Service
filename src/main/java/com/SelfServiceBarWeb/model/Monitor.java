@@ -18,7 +18,7 @@ public class Monitor {
     private String location;
 
     @ApiModelProperty(value = "监控的状态")
-    private String state;
+    private HardwareStateEnum state;
 
     public String getId() {
         return id;
@@ -44,11 +44,11 @@ public class Monitor {
         this.hardwareId = hardwareId;
     }
 
-    public String getState() {
+    public HardwareStateEnum getState() {
         return state;
     }
 
-    public void setState(String state) {
+    public void setState(HardwareStateEnum state) {
         this.state = state;
     }
 

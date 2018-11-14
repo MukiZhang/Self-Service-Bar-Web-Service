@@ -42,7 +42,7 @@ public class MonitorController {
     }
 
     @ApiOperation(value = "添加新设备")
-    @RequestMapping(path = "/create", method = RequestMethod.POST)
+    @RequestMapping(path = "", method = RequestMethod.POST)
     public Monitor createNewMonitor(@RequestBody CreateMonitorRequest createMonitorRequest) throws Exception {
         return monitorService.createNewMonitor(createMonitorRequest);
     }
