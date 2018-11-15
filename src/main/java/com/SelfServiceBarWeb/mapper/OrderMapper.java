@@ -1,6 +1,8 @@
 package com.SelfServiceBarWeb.mapper;
 
 import com.SelfServiceBarWeb.model.Order;
+import com.SelfServiceBarWeb.model.request.CreateOrderRequest;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -28,4 +30,8 @@ public interface OrderMapper {
 
     @Update("UPDATE order_info SET status = 3 WHERE id = #{id};")
     int finishOrder(@Param("id") String orderId);
+
+    @Insert("INSERT INTO order_info(order_no,bar_id,user_id,status,order_key,seat_ids,scheduled_day,begin_hour,end_hour,admission)" +
+            " VALUES(#{order_no}, #{bar_id}, #{user_id}, #{status}, #{order_key}, #{seat_ids}, #{scheduled_day}, #{begin_hour}, #{end_hour}, #{admission});")
+    void createOrder(CreateOrderRequest orderRequest);
 }

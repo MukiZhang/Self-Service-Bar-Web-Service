@@ -29,4 +29,6 @@ public class ResponseMessage {
     public static final String ERROR_ENTER_TIME = "进门时间不在预定时间内";
     public static final String INVALID_CONTROL_TOKEN = "无效的设备控制token，验证失败";
     public static final String LIGHT_NOT_NOT_FOUND = "找不到灯信息";
+    public static final String PLEASE_CLEAN = "请清理桌面";
+    public static final String ERROR_LEAVE_TIME = "您已超时";
 }
