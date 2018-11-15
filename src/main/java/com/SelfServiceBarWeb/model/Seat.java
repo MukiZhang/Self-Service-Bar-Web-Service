@@ -27,7 +27,7 @@ public class Seat {
     private String table_id;
 
     @ApiModelProperty(value = "座位状态")
-    private String state;
+    private HardwareStateEnum state;
 
     @ApiModelProperty(value = "座位位置描述")
     private String location;
@@ -68,11 +68,11 @@ public class Seat {
 
     public void setTable_id(String table_id) { this.table_id = table_id; }
 
-    public String getState() {
+    public HardwareStateEnum getState() {
         return state;
     }
 
-    public void setState(String state) {
+    public void setState(HardwareStateEnum state) {
         this.state = state;
     }
 

@@ -30,7 +30,7 @@ public class TableController {
     }
 
     @ApiOperation(value = "添加新设备")
-    @RequestMapping(path = "/create", method = RequestMethod.POST)
+    @RequestMapping(path = "", method = RequestMethod.POST)
     public Table createNewTable(@RequestBody CreateTableRequest createTableRequest) throws Exception {
         return tableService.createNewTable(createTableRequest);
     }

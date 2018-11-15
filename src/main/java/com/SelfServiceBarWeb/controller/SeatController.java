@@ -44,7 +44,7 @@ public class SeatController {
     }
 
     @ApiOperation(value = "添加新设备")
-    @RequestMapping(path = "/create", method = RequestMethod.POST)
+    @RequestMapping(path = "", method = RequestMethod.POST)
     public Seat createNewSeat(@RequestBody CreateSeatRequest createSeatRequest) throws Exception {
         return seatService.createNewSeat(createSeatRequest);
     }
