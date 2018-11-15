@@ -3,6 +3,7 @@ package com.SelfServiceBarWeb.controller;
 
 import com.SelfServiceBarWeb.model.Entrance;
 import com.SelfServiceBarWeb.model.request.EntranceStateEnum;
+import com.SelfServiceBarWeb.model.response.QRCodeContentResponse;
 import com.SelfServiceBarWeb.service.EntranceService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -57,6 +58,12 @@ public class EntranceController {
         //该请求应当是门禁向主控电脑后台发出的请求，故请求只携带二维码字符串内容
         //todo 未完成出门的验证
         entranceService.QRContentVerify(QRCodeContent);
+    }
+
+    @ApiOperation(value = "获取出门二维码")
+    @RequestMapping(path = "/leaveQRCodeContent", method = RequestMethod.POST)
+    public QRCodeContentResponse genQRCodeContent(@RequestParam(value = "token") String token) throws Exception {
+        return entranceService.genLeaveQRContent(token);
     }
 
 

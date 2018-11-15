@@ -7,6 +7,8 @@ import com.SelfServiceBarWeb.mapper.LightMapper;
 import com.SelfServiceBarWeb.mapper.OrderMapper;
 import com.SelfServiceBarWeb.model.*;
 import com.SelfServiceBarWeb.model.request.EntranceStateEnum;
+import com.SelfServiceBarWeb.model.response.HttpResponseContent;
+import com.SelfServiceBarWeb.model.response.QRCodeContentResponse;
 import com.SelfServiceBarWeb.utils.CommonUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.auth0.jwt.interfaces.DecodedJWT;
@@ -30,6 +32,7 @@ public class EntranceService {
     private static final SimpleDateFormat mysqlSdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final SimpleDateFormat scheduledDaySdf = new SimpleDateFormat("yyyy-MM-dd");
     private static final String entranceId = "12100";
+    private static final Integer QRExpireTime = 1000 * 60 * 5;
 
     @Autowired
     public EntranceService(EntranceMapper entranceMapper, OrderMapper orderMapper, HardwareStateMapper hardwareStateMapper, LightMapper lightMapper, AdministratorService administratorService) {
@@ -175,4 +178,46 @@ public class EntranceService {
         entrance.setState(HardwareStateEnum.getHardwareStateEnum(hardware.getState()));
         return entrance;
     }
+
+    public QRCodeContentResponse genLeaveQRContent(String token) throws Exception {
+        //token解析
+        DecodedJWT jwt = CommonUtil.phraseJWT(token, "userControlToken", ResponseMessage.INVALID_CONTROL_TOKEN);
+
+        String orderNo = JSONObject.parseObject(jwt.getSubject()).getString("orderNo");
+        Order order = orderMapper.getOrderByOrderNoAndStatus(orderNo);
+        if (order == null)
+            throw new SelfServiceBarWebException(404, ResponseMessage.ERROR, ResponseMessage.ORDER_NOT_NOT_FOUND);
+
+        String barId = JSONObject.parseObject(jwt.getSubject()).getString("barId");
+        if (!Objects.equals(barId, order.getBar_id()))
+            throw new SelfServiceBarWebException(403, ResponseMessage.ERROR, ResponseMessage.INVALID_CONTROL_TOKEN);
+
+        Map<String, List<String>> monitorRequest = new HashMap<>();
+        List<String> seatIds = new ArrayList<>(Arrays.asList(order.getSeat_ids().split("\\+")));
+        monitorRequest.put("seatId", seatIds);
+        //todo 调用摄像头检查申请
+        HttpResponseContent monitorResponse = CommonUtil.sendPost("http://10.108.120.232:5000/project", monitorRequest.toString());
+        if (monitorResponse.getContent() != "0")
+            throw new SelfServiceBarWebException(403, ResponseMessage.ERROR, ResponseMessage.PLEASE_CLEAN);
+        //todo 向app后台发起结束订单的请求
+        //HttpResponseContent orderResponse=CommonUtil.sendPost("http://10.108.122.61:8088/orders",monitorRequest.toString());
+
+        //生成二维码内容
+        QRCodeContentResponse qrCodeContentResponse = new QRCodeContentResponse();
+        Calendar rightNow = Calendar.getInstance();
+        int nowHour = rightNow.get(Calendar.HOUR_OF_DAY);
+        if (!order.getScheduled_day().equals(scheduledDaySdf.format(rightNow.getTime()))
+                || !(nowHour >= order.getBegin_hour() && nowHour <= order.getEnd_hour()))
+            qrCodeContentResponse.setMessage(ResponseMessage.ERROR_LEAVE_TIME);
+        Date createTime = new Date();
+        Date expireTime = new Date(createTime.getTime() + QRExpireTime);
+        Map<String, String> content = new HashMap<>();
+        content.put("orderNo", orderNo);
+        content.put("mode", "leave");
+        //content.put("admission",order.getSeat_ids().split("\\+").length+"");
+        qrCodeContentResponse.setContent(CommonUtil.createJWT(content, order.getOrder_key(), createTime, expireTime));
+        qrCodeContentResponse.setOrderNo(order.getOrder_no());
+        return qrCodeContentResponse;
+    }
+
 }
