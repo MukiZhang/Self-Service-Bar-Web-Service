@@ -56,4 +56,11 @@ public class SeatController {
     public Seat changeSeatState(@PathVariable(value = "seatId") String seatId, @RequestBody ChangeSeatRequest changeSeatRequest) throws Exception {
         return seatService.changeSeatState(seatId, changeSeatRequest);
     }
+
+    //由用户调用
+    @ApiOperation(value = "检查座位是否干净(用户)")
+    @RequestMapping(path = "/cleaning", method = RequestMethod.GET)
+    public Boolean getCleaning(@RequestParam(value = "orderNo") String orderNo) throws Exception {
+        throw new UnsupportedOperationException();
+    }
 }

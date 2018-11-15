@@ -38,6 +38,28 @@ public class Order {
     @ApiModelProperty(value = "预定结束小时")
     private Integer end_hour;
 
+    @ApiModelProperty(value = "是否完成进门验证标志位")
+    private Integer verify;
+
+    @ApiModelProperty(value = "是否完成无残留物验证标志位")
+    private Integer clean;
+
+    public Integer getVerify() {
+        return verify;
+    }
+
+    public void setVerify(Integer verify) {
+        this.verify = verify;
+    }
+
+    public Integer getClean() {
+        return clean;
+    }
+
+    public void setClean(Integer clean) {
+        this.clean = clean;
+    }
+
     public String getId() {
         return id;
     }

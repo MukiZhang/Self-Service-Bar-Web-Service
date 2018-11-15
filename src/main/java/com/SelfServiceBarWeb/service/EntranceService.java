@@ -5,10 +5,7 @@ import com.SelfServiceBarWeb.mapper.EntranceMapper;
 import com.SelfServiceBarWeb.mapper.HardwareStateMapper;
 import com.SelfServiceBarWeb.mapper.LightMapper;
 import com.SelfServiceBarWeb.mapper.OrderMapper;
-import com.SelfServiceBarWeb.model.Entrance;
-import com.SelfServiceBarWeb.model.HardwareTypeEnum;
-import com.SelfServiceBarWeb.model.Order;
-import com.SelfServiceBarWeb.model.SelfServiceBarWebException;
+import com.SelfServiceBarWeb.model.*;
 import com.SelfServiceBarWeb.model.request.EntranceStateEnum;
 import com.SelfServiceBarWeb.utils.CommonUtil;
 import com.alibaba.fastjson.JSONObject;
@@ -17,10 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Muki on 2018/11/10
@@ -35,6 +29,7 @@ public class EntranceService {
 
     private static final SimpleDateFormat mysqlSdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final SimpleDateFormat scheduledDaySdf = new SimpleDateFormat("yyyy-MM-dd");
+    private static final String entranceId = "12100";
 
     @Autowired
     public EntranceService(EntranceMapper entranceMapper, OrderMapper orderMapper, HardwareStateMapper hardwareStateMapper, LightMapper lightMapper, AdministratorService administratorService) {
@@ -60,6 +55,42 @@ public class EntranceService {
         //验证token内容是否正确
         if (userId == null || orderNoInToken == null || !userId.equals(order.getUser_id()) || !orderNoInToken.equals(orderNo))
             throw new SelfServiceBarWebException(500, ResponseMessage.ERROR, ResponseMessage.INNER_SERVER_ERROR);
+        String mode = tokenJsonObject.getString("mode");
+        switch (mode) {
+            case "enter": {
+                enterBar(order);
+                break;
+            }
+
+            case "leave": {
+                leaveBar(order);
+                break;
+            }
+        }
+
+        /*//更新订单验证成功标志，之后根据这个字段是否为1返回门禁信息
+        orderMapper.updateVerify(order.getId());
+        //将该订单的准入人数减一
+        int updateRes = orderMapper.updateAdmission(order.getId());
+        //验证准入限制
+        if (updateRes != 1)
+            throw new SelfServiceBarWebException(400, ResponseMessage.ERROR, ResponseMessage.EXCEED_ADMISSION_LIMIT);
+        //验证入门时间
+        Calendar rightNow = Calendar.getInstance();
+        int nowHour = rightNow.get(Calendar.HOUR_OF_DAY);
+        if (!order.getScheduled_day().equals(scheduledDaySdf.format(rightNow.getTime()))
+                || !(nowHour <= order.getEnd_hour()))
+            throw new SelfServiceBarWebException(400, ResponseMessage.ERROR, ResponseMessage.ERROR_ENTER_TIME);
+        //设备状态变更
+        //灯 座位
+        String[] seatIds = order.getSeat_ids().split("\\+");
+        for (String seatId : seatIds) {
+            hardwareStateMapper.openByIdAndType(seatId, HardwareTypeEnum.seat.getValue());
+            hardwareStateMapper.openByIdAndType(lightMapper.getLightIdBySeatId(seatId), HardwareTypeEnum.light.getValue());
+        }*/
+    }
+
+    private void enterBar(Order order) throws Exception {
         //更新订单验证成功标志，之后根据这个字段是否为1返回门禁信息
         orderMapper.updateVerify(order.getId());
         //将该订单的准入人数减一
@@ -73,19 +104,6 @@ public class EntranceService {
         if (!order.getScheduled_day().equals(scheduledDaySdf.format(rightNow.getTime()))
                 || !(nowHour <= order.getEnd_hour()))
             throw new SelfServiceBarWebException(400, ResponseMessage.ERROR, ResponseMessage.ERROR_ENTER_TIME);
-
-        /*Entrance entrance = entranceMapper.getEntranceInfo();
-
-        //采用jwt获得token
-        Date createTime = new Date();
-        //过期时间应为订单所选时间到时时间
-        Date expireTime = mysqlSdf.parse(order.getScheduled_day() + " " + order.getEnd_hour() + ":00:00");
-        Map<String, String> content = new HashMap<>();
-        content.put("uid", userId);
-        content.put("barId", entrance.getBar_id());
-        String token = CommonUtil.createJWT(content, "userControlToken", createTime, expireTime);
-        entrance.setToken(token);*/
-
         //设备状态变更
         //灯 座位
         String[] seatIds = order.getSeat_ids().split("\\+");
@@ -95,14 +113,37 @@ public class EntranceService {
         }
     }
 
-    public Entrance getEntranceInfo(String token) throws Exception {
+    private void leaveBar(Order order) throws Exception {
+        orderMapper.finishOrder(order.getId());
+        //todo 调用app后台的结束订单请求 更新app后台的订单状态
+        /*//验证出门时间
+        Calendar rightNow = Calendar.getInstance();
+        int nowHour = rightNow.get(Calendar.HOUR_OF_DAY);
+        if (!order.getScheduled_day().equals(scheduledDaySdf.format(rightNow.getTime()))
+                || !(nowHour <= order.getEnd_hour()))
+            throw new SelfServiceBarWebException(400, ResponseMessage.ERROR, ResponseMessage.ERROR_ENTER_TIME);*/
+        //设备状态变更
+        //灯 座位
+        String[] seatIds = order.getSeat_ids().split("\\+");
+        for (String seatId : seatIds) {
+            hardwareStateMapper.closeByIdAndType(seatId, HardwareTypeEnum.seat.getValue());
+            hardwareStateMapper.closeByIdAndType(lightMapper.getLightIdBySeatId(seatId), HardwareTypeEnum.light.getValue());
+        }
+    }
+
+    public List<Entrance> getEntranceInfo(String token) throws Exception {
+        List<Entrance> entrances = new ArrayList<>();
         administratorService.getAdministratorIdFromToken(token);
-        return entranceMapper.getEntranceInfo();
+        Hardware hardware = hardwareStateMapper.getByIdAndType(entranceId, HardwareTypeEnum.entrance.getValue());
+        Entrance entrance = entranceMapper.getEntranceInfo(entranceId);
+        entrance.setState(HardwareStateEnum.getHardwareStateEnum(hardware.getState()));
+        entrances.add(entrance);
+        return entrances;
     }
 
     public String getDeviceControlToken(String orderNo) throws Exception {
-        Entrance entrance = entranceMapper.getEntranceInfo();
-        Order order = orderMapper.getOrderByOrderNoAndStatus(orderNo);
+        Entrance entrance = entranceMapper.getEntranceInfo(entranceId);
+        Order order = orderMapper.getOrderByOrderNoAndVerify(orderNo);
         if (order == null)
             throw new SelfServiceBarWebException(404, ResponseMessage.ERROR, ResponseMessage.ORDER_NOT_NOT_FOUND);
 
@@ -117,9 +158,8 @@ public class EntranceService {
         return CommonUtil.createJWT(content, "userControlToken", createTime, expireTime);
     }
 
-
     public Entrance changeEntranceState(String token, EntranceStateEnum entranceStateEnum) throws Exception {
-        Entrance entrance = entranceMapper.getEntranceInfo();
+        Entrance entrance = entranceMapper.getEntranceInfo(entranceId);
         administratorService.getAdministratorIdFromToken(token);
         switch (entranceStateEnum) {
             case open: {
@@ -131,6 +171,8 @@ public class EntranceService {
                 break;
             }
         }
+        Hardware hardware = hardwareStateMapper.getByIdAndType(entranceId, HardwareTypeEnum.entrance.getValue());
+        entrance.setState(HardwareStateEnum.getHardwareStateEnum(hardware.getState()));
         return entrance;
     }
 }

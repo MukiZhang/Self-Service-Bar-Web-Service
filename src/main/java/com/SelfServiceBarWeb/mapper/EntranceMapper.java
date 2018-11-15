@@ -1,6 +1,7 @@
 package com.SelfServiceBarWeb.mapper;
 
 import com.SelfServiceBarWeb.model.Entrance;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 /**
@@ -8,6 +9,6 @@ import org.apache.ibatis.annotations.Select;
  */
 public interface EntranceMapper {
     //目前暂定一个门禁
-    @Select("SELECT * FROM entrance_info;")
-    Entrance getEntranceInfo();
+    @Select("SELECT * FROM entrance_info WHERE id=#{id};")
+    Entrance getEntranceInfo(@Param("id") String id);
 }
