@@ -5,7 +5,7 @@ package com.SelfServiceBarWeb.model;
  */
 public enum HardwareStateEnum {
     open(1),
-    close(2);
+    close(0);
     private int value;
 
     HardwareStateEnum(int value) {
