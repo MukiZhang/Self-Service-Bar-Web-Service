@@ -148,8 +148,14 @@ public class LightService {
         //返回座位id对应的灯id
         List<Light> lights = new ArrayList<>();
         String[] seatIds = order.getSeat_ids().split("\\+");
-        for (String seatId : seatIds)
-            lights.add(lightMapper.getLightBySeatId(seatId));
+        for (String seatId : seatIds) {
+            Light light = lightMapper.getLightBySeatId(seatId);
+            Hardware lightState = hardwareStateMapper.getByIdAndType(light.getId(), HardwareTypeEnum.light.getValue());
+            light.setState(HardwareStateEnum.getHardwareStateEnum(lightState.getState()));
+            light.setLuminance(lightState.getLuminance());
+            lights.add(light);
+        }
+
         return lights;
     }
 }
