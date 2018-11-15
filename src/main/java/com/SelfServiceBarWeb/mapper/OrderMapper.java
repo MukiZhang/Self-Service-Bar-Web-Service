@@ -19,4 +19,13 @@ public interface OrderMapper {
 
     @Update("UPDATE order_info SET verify = 1 WHERE id = #{id};")
     int updateVerify(@Param("id") String orderId);
+
+    @Select("SELECT * FROM order_info WHERE order_no=#{orderNo} AND verify=1;")
+    Order getOrderByOrderNoAndVerify(@Param("orderNo") String orderNo);
+
+    @Select("SELECT * FROM order_info WHERE order_no=#{orderNo} AND clean=1;")
+    Order getOrderByOrderNoAndClean(@Param("orderNo") String orderNo);
+
+    @Update("UPDATE order_info SET status = 3 WHERE id = #{id};")
+    int finishOrder(@Param("id") String orderId);
 }

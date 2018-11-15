@@ -20,6 +20,17 @@ public class Entrance {
     @ApiModelProperty(value = "设备控制token")
     private String token;
 
+    @ApiModelProperty(value = "门禁状态")
+    private HardwareStateEnum state;
+
+    public HardwareStateEnum getState() {
+        return state;
+    }
+
+    public void setState(HardwareStateEnum state) {
+        this.state = state;
+    }
+
     public String getToken() {
         return token;
     }
