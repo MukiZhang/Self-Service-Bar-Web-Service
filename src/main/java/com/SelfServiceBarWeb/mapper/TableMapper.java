@@ -3,6 +3,7 @@ package com.SelfServiceBarWeb.mapper;
 import com.SelfServiceBarWeb.model.Table;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.SelectKey;
 
 import java.util.List;
 
@@ -15,5 +16,6 @@ public interface TableMapper {
 
     @Insert("INSERT INTO table_info(left_up_x_coordinate,left_up_y_coordinate, right_down_x_coordinate,right_down_y_coordinate, location)" +
             " VALUES(#{left_up_x_coordinate}, #{left_up_y_coordinate}, #{right_down_x_coordinate}, #{right_down_y_coordinate}, #{location});")
+    @SelectKey(statement = "select last_insert_id()", keyProperty = "id", before = false, resultType = String.class)
     void createNewTable(Table table);
 }

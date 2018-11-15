@@ -4,6 +4,7 @@ import com.SelfServiceBarWeb.model.Monitor;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.SelectKey;
 
 import java.util.List;
 
@@ -16,5 +17,6 @@ public interface MonitorMapper {
 
     @Insert("INSERT INTO monitor_info(ipAddress,hardwareId, location)" +
             " VALUES(#{ipAddress}, #{hardwareId}, #{location});")
+    @SelectKey(statement = "select last_insert_id()", keyProperty = "id", before = false, resultType = String.class)
     void createNewMonitor(Monitor monitor);
 }
