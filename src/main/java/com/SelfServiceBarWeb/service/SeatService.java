@@ -1,6 +1,7 @@
 package com.SelfServiceBarWeb.service;
 
 import com.SelfServiceBarWeb.constant.ResponseMessage;
+import com.SelfServiceBarWeb.mapper.HardwareLogMapper;
 import com.SelfServiceBarWeb.mapper.HardwareStateMapper;
 import com.SelfServiceBarWeb.mapper.SeatMapper;
 import com.SelfServiceBarWeb.mapper.TableMapper;
@@ -12,6 +13,7 @@ import com.SelfServiceBarWeb.model.request.SeatStateEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,13 +26,25 @@ public class SeatService {
     private final TableMapper tableMapper;
     private final AdministratorService administratorService;
     private final HardwareStateMapper hardwareStateMapper;
+    private final HardwareLogMapper hardwareLogMapper;
 
     @Autowired
-    public SeatService(SeatMapper seatMapper, TableMapper tableMapper, AdministratorService administratorService, HardwareStateMapper hardwareStateMapper) {
+    public SeatService(SeatMapper seatMapper, TableMapper tableMapper, AdministratorService administratorService, HardwareStateMapper hardwareStateMapper, HardwareLogMapper hardwareLogMapper) {
         this.seatMapper = seatMapper;
         this.tableMapper = tableMapper;
         this.administratorService = administratorService;
         this.hardwareStateMapper = hardwareStateMapper;
+        this.hardwareLogMapper = hardwareLogMapper;
+    }
+
+    private List<HardwareLog> getHardwareLog(String id) {
+        List<HardwareLog> hardwareLogs = hardwareLogMapper.getAllByIdAndType(id, HardwareTypeEnum.seat.getValue());
+        List<HardwareLog> logs = new ArrayList<>();
+
+        for (int i = hardwareLogs.size() - 1; i >= 0 && i >= hardwareLogs.size() - 10; i--) {
+            logs.add(hardwareLogs.get(i));
+        }
+        return logs;
     }
 
     public List<Seat> getAllSeats(String token) throws Exception {
@@ -40,6 +54,7 @@ public class SeatService {
         for (Seat seat : seats) {
             Hardware monitorState = hardwareStateMapper.getByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue());
             seat.setState(HardwareStateEnum.getHardwareStateEnum(monitorState.getState()));
+            seat.setHardwareLogs(getHardwareLog(seat.getId()));
         }
         return seats;
     }
@@ -49,6 +64,7 @@ public class SeatService {
         for (Seat seat : seats) {
             Hardware monitorState = hardwareStateMapper.getByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue());
             seat.setState(HardwareStateEnum.getHardwareStateEnum(monitorState.getState()));
+            seat.setHardwareLogs(getHardwareLog(seat.getId()));
         }
         return seats;
     }
@@ -63,6 +79,7 @@ public class SeatService {
 
         Hardware monitorState = hardwareStateMapper.getByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue());
         seat.setState(HardwareStateEnum.getHardwareStateEnum(monitorState.getState()));
+        seat.setHardwareLogs(getHardwareLog(seat.getId()));
 
         return seat;
     }
@@ -87,6 +104,12 @@ public class SeatService {
         hardwareStateMapper.createNewHardwareState(hardware);
         seat.setState(HardwareStateEnum.close);
 
+        //加入日志
+        HardwareLog hardwareLog = new HardwareLog(seat.getId(), HardwareTypeEnum.seat.getValue(), "administer", HardwareStateEnum.create.getValue(), "");
+        hardwareLogMapper.createNewLog(hardwareLog);
+
+        seat.setHardwareLogs(getHardwareLog(seat.getId()));
+
         return seat;
     }
 
@@ -94,17 +117,25 @@ public class SeatService {
         administratorService.getAdministratorIdFromToken(changeSeatRequest.getToken());
 
         Seat seat = seatMapper.getBySeatId(seatId);
+        HardwareLog hardwareLog;
         if (seat == null)
             throw new SelfServiceBarWebException(400, ResponseMessage.ERROR, ResponseMessage.GET_SEAT_INFO_ERROR);
         //修改seat状态
         switch (changeSeatRequest.getMode()) {
             case open:
                 hardwareStateMapper.openByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue());
+                //加入日志
+                hardwareLog = new HardwareLog(seat.getId(), HardwareTypeEnum.seat.getValue(), "administer", HardwareStateEnum.open.getValue(), "");
+                hardwareLogMapper.createNewLog(hardwareLog);
                 break;
             case close:
                 hardwareStateMapper.closeByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue());
+                //加入日志
+                hardwareLog = new HardwareLog(seat.getId(), HardwareTypeEnum.seat.getValue(), "administer", HardwareStateEnum.close.getValue(), "");
+                hardwareLogMapper.createNewLog(hardwareLog);
                 break;
         }
+        seat.setHardwareLogs(getHardwareLog(seat.getId()));
 
         return seat;
     }

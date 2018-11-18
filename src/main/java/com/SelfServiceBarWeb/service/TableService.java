@@ -1,5 +1,6 @@
 package com.SelfServiceBarWeb.service;
 
+import com.SelfServiceBarWeb.mapper.HardwareLogMapper;
 import com.SelfServiceBarWeb.mapper.SeatMapper;
 import com.SelfServiceBarWeb.mapper.TableMapper;
 import com.SelfServiceBarWeb.model.Table;

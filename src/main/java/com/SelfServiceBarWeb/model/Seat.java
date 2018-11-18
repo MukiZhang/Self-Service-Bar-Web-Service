@@ -3,6 +3,8 @@ package com.SelfServiceBarWeb.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.util.List;
+
 /**
  * Created by Fw on 2018/11/6
  */
@@ -31,6 +33,9 @@ public class Seat {
 
     @ApiModelProperty(value = "座位位置描述")
     private String location;
+
+    @ApiModelProperty(value = "座位最近使用记录")
+    private List<HardwareLog> hardwareLogs;
 
     public String getId() {
         return id;
@@ -82,6 +87,14 @@ public class Seat {
 
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    public List<HardwareLog> getHardwareLogs() {
+        return hardwareLogs;
+    }
+
+    public void setHardwareLogs(List<HardwareLog> hardwareLogs) {
+        this.hardwareLogs = hardwareLogs;
     }
 }
 
