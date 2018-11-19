@@ -196,12 +196,11 @@ public class EntranceService {
         List<String> seatIds = new ArrayList<>(Arrays.asList(order.getSeat_ids().split("\\+")));
         monitorRequest.put("seatId", seatIds);
         //todo 调用摄像头检查申请
-        HttpResponseContent monitorResponse = CommonUtil.sendPost("http://10.108.120.232:5000/project", monitorRequest.toString());
-        if (monitorResponse.getContent() != "0")
+        HttpResponseContent monitorResponse = CommonUtil.sendPost("http://10.108.122.210:5000/project", JSONObject.toJSONString(monitorRequest));
+        if (monitorResponse.getContent() == "0")
             throw new SelfServiceBarWebException(403, ResponseMessage.ERROR, ResponseMessage.PLEASE_CLEAN);
         //todo 向app后台发起结束订单的请求
-        //HttpResponseContent orderResponse=CommonUtil.sendPost("http://10.108.122.61:8088/orders",monitorRequest.toString());
-
+        HttpResponseContent orderResponse = CommonUtil.sendPatch("http://10.108.122.61:8088/orders/finishStatus/" + orderNo + "?uid=" + JSONObject.parseObject(jwt.getSubject()).getString("uid"));
         //生成二维码内容
         QRCodeContentResponse qrCodeContentResponse = new QRCodeContentResponse();
         Calendar rightNow = Calendar.getInstance();
@@ -213,6 +212,7 @@ public class EntranceService {
         Date expireTime = new Date(createTime.getTime() + QRExpireTime);
         Map<String, String> content = new HashMap<>();
         content.put("orderNo", orderNo);
+        content.put("uid", order.getUser_id());
         content.put("mode", "leave");
         //content.put("admission",order.getSeat_ids().split("\\+").length+"");
         qrCodeContentResponse.setContent(CommonUtil.createJWT(content, order.getOrder_key(), createTime, expireTime));
