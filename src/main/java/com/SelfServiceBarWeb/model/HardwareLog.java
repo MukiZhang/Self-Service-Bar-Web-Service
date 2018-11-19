@@ -2,7 +2,7 @@ package com.SelfServiceBarWeb.model;
 
 import io.swagger.annotations.ApiModelProperty;
 
-import java.sql.Time;
+import java.sql.Timestamp;
 
 public class HardwareLog {
     @ApiModelProperty(value = "设备id")
@@ -12,7 +12,7 @@ public class HardwareLog {
     private Integer type;
 
     @ApiModelProperty(value = "操作时间")
-    private Time time;
+    private Timestamp time;
 
     @ApiModelProperty(value = "操作事项")
     private Integer affair;
@@ -59,20 +59,20 @@ public class HardwareLog {
         this.affair = affair;
     }
 
-    public Time getTime() {
+    public Timestamp getTime() {
         return time;
     }
 
-    public void setTime(Time time) {
+    public void setTime(Timestamp time) {
         this.time = time;
     }
 
-    public String getUser_id() {
+    public String getUser() {
         return user;
     }
 
-    public void setUser_id(String user_id) {
-        this.user = user_id;
+    public void setUser(String user) {
+        this.user = user;
     }
 
     public String getComment() {

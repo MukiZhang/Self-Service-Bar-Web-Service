@@ -23,6 +23,8 @@ public class ResponseMessage {
 
     public static final String GET_MONITOR_INFO_ERROR = "修改监控状态时发生错误";
 
+    public static final String GET_LOG_INFO_ERROR = "获取日志时发生错误";
+
     public static final String INVALID_ORDER_TOKEN = "无效的订单token，验证失败";
     public static final String ORDER_NOT_NOT_FOUND = "找不到符合条件的订单";
     public static final String EXCEED_ADMISSION_LIMIT = "超过准入人数限制";

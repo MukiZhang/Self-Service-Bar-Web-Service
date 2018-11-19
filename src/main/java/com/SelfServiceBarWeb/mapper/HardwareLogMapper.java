@@ -16,4 +16,9 @@ public interface HardwareLogMapper {
     @Select("SELECT * FROM hardware_use_log WHERE type=#{type} AND device_id=#{device_id};")
     List<HardwareLog> getAllByIdAndType(@Param("device_id") String device_id, @Param("type") Integer type);
 
+    @Select("SELECT * FROM hardware_use_log WHERE type=#{type};")
+    List<HardwareLog> getAllByType(@Param("type") Integer type);
+
+    @Select("SELECT * FROM hardware_use_log;")
+    List<HardwareLog> getAll();
 }
