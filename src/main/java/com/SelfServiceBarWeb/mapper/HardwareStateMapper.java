@@ -35,6 +35,9 @@ public interface HardwareStateMapper {
     @Update("UPDATE hardware_state SET luminance = #{luminance} WHERE device_id=#{id} AND type=#{type};")
     int setLuminanceByIdAndType(@Param("luminance") Integer luminance, @Param("id") String id, @Param("type") Integer type);
 
+    @Update("UPDATE hardware_state SET color_temperature = #{color_temperature} WHERE device_id=#{id} AND type=#{type};")
+    int setColorTemperatureByIdAndType(@Param("color_temperature") Integer color_temperature, @Param("id") String id, @Param("type") Integer type);
+
     @Insert("INSERT INTO hardware_state(device_id,type)" +
             " VALUES(#{device_id}, #{type});")
     void createNewHardwareState(Hardware hardware);

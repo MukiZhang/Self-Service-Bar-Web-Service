@@ -70,6 +70,7 @@ public class LightService {
         light.setState(HardwareStateEnum.getHardwareStateEnum(lightState.getState()));
         light.setHardwareLogs(getHardwareLog(light.getId()));
         light.setLuminance(lightState.getLuminance());
+        light.setColor_temperature(lightState.getColor_temperature());
         return light;
     }
 
@@ -81,6 +82,7 @@ public class LightService {
             light.setState(HardwareStateEnum.getHardwareStateEnum(lightState.getState()));
             light.setHardwareLogs(getHardwareLog(light.getId()));
             light.setLuminance(lightState.getLuminance());
+            light.setColor_temperature(lightState.getColor_temperature());
         }
         return lights;
     }
@@ -178,11 +180,21 @@ public class LightService {
                 hardwareLogMapper.createNewLog(hardwareLog);
                 break;
             }
+            case setColorTemperature: {
+                if (changeLightRequest.getColor_temperature() < 0 || changeLightRequest.getColor_temperature() > 100)
+                    throw new SelfServiceBarWebException(400, ResponseMessage.ERROR, ResponseMessage.ERROR_PARAM);
+                hardwareStateMapper.setColorTemperatureByIdAndType(changeLightRequest.getColor_temperature(), lightId, HardwareTypeEnum.light.getValue());
+
+                hardwareLog = new HardwareLog(lightId, HardwareTypeEnum.light.getValue(), identity, HardwareStateEnum.change_color_temperature.getValue(), "" + changeLightRequest.getColor_temperature());
+                hardwareLogMapper.createNewLog(hardwareLog);
+                break;
+            }
         }
 
         Hardware lightState = hardwareStateMapper.getByIdAndType(lightId, HardwareTypeEnum.light.getValue());
         light.setState(HardwareStateEnum.getHardwareStateEnum(lightState.getState()));
         light.setLuminance(lightState.getLuminance());
+        light.setColor_temperature(lightState.getColor_temperature());
 
         light.setHardwareLogs(getHardwareLog(light.getId()));
         return light;
@@ -209,6 +221,7 @@ public class LightService {
             Hardware lightState = hardwareStateMapper.getByIdAndType(light.getId(), HardwareTypeEnum.light.getValue());
             light.setState(HardwareStateEnum.getHardwareStateEnum(lightState.getState()));
             light.setLuminance(lightState.getLuminance());
+            light.setColor_temperature(lightState.getColor_temperature());
             light.setHardwareLogs(getHardwareLog(light.getId()));
             lights.add(light);
         }

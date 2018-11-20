@@ -18,6 +18,9 @@ public class ChangeLightRequest {
     @ApiModelProperty(value = "对亮度的修改值，可能是offset或者是指定的亮度值，亮度的范围为0~100")
     private Integer luminanceValue;
 
+    @ApiModelProperty(value = "对色温的修改值，色温的范围为0~100")
+    private Integer color_temperature;
+
     public Integer getLuminanceValue() {
         return luminanceValue;
     }
@@ -48,5 +51,13 @@ public class ChangeLightRequest {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public Integer getColor_temperature() {
+        return color_temperature;
+    }
+
+    public void setColor_temperature(Integer color_temperature) {
+        this.color_temperature = color_temperature;
     }
 }

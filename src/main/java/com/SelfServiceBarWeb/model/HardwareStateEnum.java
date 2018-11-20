@@ -9,7 +9,8 @@ public enum HardwareStateEnum {
     create(2),
     change_luminance(3),
     error(4),
-    repair(5);
+    repair(5),
+    change_color_temperature(6);
     private int value;
 
     HardwareStateEnum(int value) {

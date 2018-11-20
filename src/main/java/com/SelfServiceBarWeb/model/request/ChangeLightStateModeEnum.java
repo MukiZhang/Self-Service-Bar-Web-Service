@@ -7,7 +7,8 @@ public enum ChangeLightStateModeEnum {
     open(1),
     close(2),
     luminanceOffset(3),
-    setLuminance(4);
+    setLuminance(4),
+    setColorTemperature(5);
     private int value;
 
     ChangeLightStateModeEnum(int value) {

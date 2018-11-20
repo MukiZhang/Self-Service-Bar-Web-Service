@@ -18,6 +18,9 @@ public class Hardware {
     @ApiModelProperty(value = "灯光亮度")
     private Integer luminance;
 
+    @ApiModelProperty(value = "灯光色温")
+    private Integer color_temperature;
+
     public Hardware(String device_id, Integer type) {
         this.device_id = device_id;
         this.type = type;
@@ -57,5 +60,13 @@ public class Hardware {
 
     public void setLuminance(Integer luminance) {
         this.luminance = luminance;
+    }
+
+    public Integer getColor_temperature() {
+        return color_temperature;
+    }
+
+    public void setColor_temperature(Integer color_temperature) {
+        this.color_temperature = color_temperature;
     }
 }

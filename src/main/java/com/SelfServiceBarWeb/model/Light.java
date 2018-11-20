@@ -44,6 +44,9 @@ public class Light {
     @ApiModelProperty(value = "灯的亮度")
     private Integer luminance;
 
+    @ApiModelProperty(value = "灯的色温")
+    private Integer color_temperature;
+
     public HardwareStateEnum getState() {
         return state;
     }
@@ -130,5 +133,13 @@ public class Light {
 
     public void setUse_at(Timestamp use_at) {
         this.use_at = use_at;
+    }
+
+    public Integer getColor_temperature() {
+        return color_temperature;
+    }
+
+    public void setColor_temperature(Integer color_temperature) {
+        this.color_temperature = color_temperature;
     }
 }
