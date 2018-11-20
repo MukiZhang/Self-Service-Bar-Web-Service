@@ -17,4 +17,13 @@ public enum HardwareTypeEnum {
     public int getValue() {
         return value;
     }
+
+    public static HardwareTypeEnum getHardwareTypeEnum(int value) {
+        for (HardwareTypeEnum hardwareTypeEnum : HardwareTypeEnum.values()) {
+            if (value == hardwareTypeEnum.getValue()) {
+                return hardwareTypeEnum;
+            }
+        }
+        return null;
+    }
 }

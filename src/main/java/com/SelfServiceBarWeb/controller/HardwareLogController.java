@@ -1,6 +1,7 @@
 package com.SelfServiceBarWeb.controller;
 
 import com.SelfServiceBarWeb.model.HardwareLog;
+import com.SelfServiceBarWeb.model.request.CreateLogRequest;
 import com.SelfServiceBarWeb.service.HardwareLogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -23,9 +24,15 @@ public class HardwareLogController {
     }
 
     //该请求是管理员调用
-    @ApiOperation(value = "获取指定id的灯光信息(管理员)")
+    @ApiOperation(value = "获取某类硬件日志(管理员)")
     @RequestMapping(path = "/{kind}", method = RequestMethod.GET)
     public List<HardwareLog> getLogs(@PathVariable(value = "kind") String kind, @RequestParam(value = "token") String token) throws Exception {
         return hardwareLogService.getLogs(kind, token);
+    }
+
+    @ApiOperation(value = "添加维修记录(管理员)")
+    @RequestMapping(path = "", method = RequestMethod.POST)
+    public HardwareLog createNewLog(@RequestBody CreateLogRequest createLogRequest) throws Exception {
+        return hardwareLogService.createNewLog(createLogRequest);
     }
 }

@@ -3,7 +3,9 @@ package com.SelfServiceBarWeb.service;
 import com.SelfServiceBarWeb.constant.ResponseMessage;
 import com.SelfServiceBarWeb.mapper.HardwareLogMapper;
 import com.SelfServiceBarWeb.model.HardwareLog;
+import com.SelfServiceBarWeb.model.HardwareStateEnum;
 import com.SelfServiceBarWeb.model.SelfServiceBarWebException;
+import com.SelfServiceBarWeb.model.request.CreateLogRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -45,6 +47,20 @@ public class HardwareLogService {
                 throw new SelfServiceBarWebException(403, ResponseMessage.ERROR, ResponseMessage.GET_LOG_INFO_ERROR);
         }
         return hardwareLogs;
+    }
+
+    public HardwareLog createNewLog(CreateLogRequest createLogRequest) throws Exception {
+        String administratorId = administratorService.getAdministratorIdFromToken(createLogRequest.getLoginToken());
+        HardwareLog hardwareLog = new HardwareLog();
+        hardwareLog.setDevice_id(createLogRequest.getDevice_id());
+        hardwareLog.setType(createLogRequest.getType().getValue());
+        hardwareLog.setAffair(HardwareStateEnum.repair.getValue());
+        hardwareLog.setComment(createLogRequest.getComment());
+        hardwareLog.setUser("administer");
+
+        //加入日志
+        hardwareLogMapper.createNewLog(hardwareLog);
+        return hardwareLog;
     }
 
 }

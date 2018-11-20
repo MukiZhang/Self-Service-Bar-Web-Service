@@ -10,6 +10,7 @@ import com.SelfServiceBarWeb.model.*;
 import com.SelfServiceBarWeb.model.request.ChangeSeatRequest;
 import com.SelfServiceBarWeb.model.request.CreateSeatRequest;
 import com.SelfServiceBarWeb.model.request.SeatStateEnum;
+import com.SelfServiceBarWeb.utils.CommonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -91,13 +92,29 @@ public class SeatService {
         if (table == null)
             throw new SelfServiceBarWebException(400, ResponseMessage.ERROR, ResponseMessage.CREATE_SEAT_ERROR);
 
+        //TODO：检查座位位置情况
+
         Seat seat = new Seat();
         seat.setHardwareId(createSeatRequest.getHardwareId());
-        seat.setIpAddress(createSeatRequest.getIpAddress());
         seat.setTable_id(createSeatRequest.getTable_id());
         seat.setPosition_x(createSeatRequest.getPosition_x());
         seat.setPosition_y(createSeatRequest.getPosition_y());
         seat.setLocation(createSeatRequest.getLocation());
+        seat.setProducer(createSeatRequest.getProducer());
+        seat.setCreate_at(createSeatRequest.getCreate_at());
+        seat.setUse_at(createSeatRequest.getUse_at());
+
+
+        //自动生成IP地址
+        List<Seat> seats = seatMapper.getAllSeats();
+        long maxIp = CommonUtil.ipToLong("192.168.0.0");
+        for (Seat tempSeat : seats) {
+            long temp = CommonUtil.ipToLong(tempSeat.getIpAddress());
+            if (temp > maxIp)
+                maxIp = temp;
+        }
+        seat.setIpAddress(CommonUtil.longToIP(maxIp + 1));
+
 
         seatMapper.createNewSeat(seat);
         Hardware hardware = new Hardware(seat.getId(), HardwareTypeEnum.seat.getValue());

@@ -18,8 +18,8 @@ public interface SeatMapper {
     @Select("SELECT * FROM seat_info WHERE id = #{seatId}")
     Seat getBySeatId(@Param("seatId") String seatId);
 
-    @Insert("INSERT INTO seat_info(ipAddress,hardwareId,position_x,position_y, location,table_id)" +
-            " VALUES(#{ipAddress}, #{hardwareId}, #{position_x}, #{position_y}, #{location}, #{table_id});")
+    @Insert("INSERT INTO seat_info(ipAddress,hardwareId,position_x,position_y, location,table_id,producer,create_at,use_at)" +
+            " VALUES(#{ipAddress}, #{hardwareId}, #{position_x}, #{position_y}, #{location}, #{table_id}, #{producer}, #{create_at}, #{use_at});")
     @SelectKey(statement = "select last_insert_id()", keyProperty = "id", before = false, resultType = String.class)
     void createNewSeat(Seat seat);
 

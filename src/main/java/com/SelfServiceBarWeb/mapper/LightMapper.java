@@ -24,8 +24,8 @@ public interface LightMapper {
     @Select("SELECT * FROM light_info;")
     List<Light> getAll();
 
-    @Insert("INSERT INTO light_info(ip_address,hardware_id,seat_id,bar_id)" +
-            " VALUES(#{ip_address}, #{hardware_id}, #{seat_id}, #{bar_id});")
+    @Insert("INSERT INTO light_info(ip_address,hardware_id,seat_id,bar_id,producer,create_at,use_at)" +
+            " VALUES(#{ip_address}, #{hardware_id}, #{seat_id}, #{bar_id}, #{producer}, #{create_at}, #{use_at});")
     @SelectKey(statement = "select last_insert_id()", keyProperty = "id", before = false, resultType = String.class)
     void createNewLight(Light light);
 

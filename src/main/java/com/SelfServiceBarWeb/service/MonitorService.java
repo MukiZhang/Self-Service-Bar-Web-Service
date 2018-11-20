@@ -8,6 +8,7 @@ import com.SelfServiceBarWeb.model.*;
 import com.SelfServiceBarWeb.model.request.ChangeMonitorRequest;
 import com.SelfServiceBarWeb.model.request.CreateMonitorRequest;
 import com.SelfServiceBarWeb.model.request.MonitorStateEnum;
+import com.SelfServiceBarWeb.utils.CommonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -70,8 +71,21 @@ public class MonitorService {
 
         Monitor monitor = new Monitor();
         monitor.setHardwareId(createMonitorRequest.getHardwareId());
-        monitor.setIpAddress(createMonitorRequest.getIpAddress());
         monitor.setLocation(createMonitorRequest.getLocation());
+        monitor.setProducer(createMonitorRequest.getProducer());
+        monitor.setCreate_at(createMonitorRequest.getCreate_at());
+        monitor.setUse_at(createMonitorRequest.getUse_at());
+
+        //自动生成IP地址
+        List<Monitor> monitors = monitorMapper.getAll();
+        long maxIp = CommonUtil.ipToLong("192.168.1.0");
+        for (Monitor tempMonitor : monitors) {
+            long temp = CommonUtil.ipToLong(tempMonitor.getIpAddress());
+            if (temp > maxIp) {
+                maxIp = temp;
+            }
+        }
+        monitor.setIpAddress(CommonUtil.longToIP(maxIp + 1));
 
         monitorMapper.createNewMonitor(monitor);
         Hardware hardware = new Hardware(monitor.getId(), HardwareTypeEnum.monitor.getValue());
