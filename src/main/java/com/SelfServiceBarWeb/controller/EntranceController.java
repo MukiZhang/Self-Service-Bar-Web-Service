@@ -56,7 +56,6 @@ public class EntranceController {
     @RequestMapping(path = "/verification", method = RequestMethod.POST)
     public void enterQRContentVerify(@RequestBody String QRCodeContent) throws Exception {
         //该请求应当是门禁向主控电脑后台发出的请求，故请求只携带二维码字符串内容
-        //todo 未完成出门的验证
         entranceService.QRContentVerify(QRCodeContent);
     }
 
@@ -64,6 +63,12 @@ public class EntranceController {
     @RequestMapping(path = "/leaveQRCodeContent", method = RequestMethod.POST)
     public QRCodeContentResponse genQRCodeContent(@RequestParam(value = "token") String token) throws Exception {
         return entranceService.genLeaveQRContent(token);
+    }
+
+    @ApiOperation(value = "获取临时出门二维码")
+    @RequestMapping(path = "/temporaryLeaveQRCodeContent", method = RequestMethod.POST)
+    public QRCodeContentResponse genTempQRCodeContent(@RequestParam(value = "token") String token) throws Exception {
+        return entranceService.genTempLeaveQRContent(token);
     }
 
 

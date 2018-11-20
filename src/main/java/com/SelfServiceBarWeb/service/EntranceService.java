@@ -44,6 +44,7 @@ public class EntranceService {
     }
 
     //进门二维码的验证
+    //在扫码出入门时进行准入人数的判断
     public void QRContentVerify(String QRCodeContent) throws Exception {
         JSONObject jsonObject = JSONObject.parseObject(QRCodeContent);
         String orderNo = jsonObject.getString("orderNo");
@@ -64,40 +65,21 @@ public class EntranceService {
                 enterBar(order);
                 break;
             }
-
             case "leave": {
-                leaveBar(order);
+                break;
+            }
+            case "tempLeave": {
+                tempLeaveBar(order);
                 break;
             }
         }
-
-        /*//更新订单验证成功标志，之后根据这个字段是否为1返回门禁信息
-        orderMapper.updateVerify(order.getId());
-        //将该订单的准入人数减一
-        int updateRes = orderMapper.updateAdmission(order.getId());
-        //验证准入限制
-        if (updateRes != 1)
-            throw new SelfServiceBarWebException(400, ResponseMessage.ERROR, ResponseMessage.EXCEED_ADMISSION_LIMIT);
-        //验证入门时间
-        Calendar rightNow = Calendar.getInstance();
-        int nowHour = rightNow.get(Calendar.HOUR_OF_DAY);
-        if (!order.getScheduled_day().equals(scheduledDaySdf.format(rightNow.getTime()))
-                || !(nowHour <= order.getEnd_hour()))
-            throw new SelfServiceBarWebException(400, ResponseMessage.ERROR, ResponseMessage.ERROR_ENTER_TIME);
-        //设备状态变更
-        //灯 座位
-        String[] seatIds = order.getSeat_ids().split("\\+");
-        for (String seatId : seatIds) {
-            hardwareStateMapper.openByIdAndType(seatId, HardwareTypeEnum.seat.getValue());
-            hardwareStateMapper.openByIdAndType(lightMapper.getLightIdBySeatId(seatId), HardwareTypeEnum.light.getValue());
-        }*/
     }
 
     private void enterBar(Order order) throws Exception {
         //更新订单验证成功标志，之后根据这个字段是否为1返回门禁信息
         orderMapper.updateVerify(order.getId());
-        //将该订单的准入人数减一
-        int updateRes = orderMapper.updateAdmission(order.getId());
+        //增加进门人数
+        int updateRes = orderMapper.increaseExisting(order.getId());
         //验证准入限制
         if (updateRes != 1)
             throw new SelfServiceBarWebException(400, ResponseMessage.ERROR, ResponseMessage.EXCEED_ADMISSION_LIMIT);
@@ -107,31 +89,23 @@ public class EntranceService {
         if (!order.getScheduled_day().equals(scheduledDaySdf.format(rightNow.getTime()))
                 || !(nowHour <= order.getEnd_hour()))
             throw new SelfServiceBarWebException(400, ResponseMessage.ERROR, ResponseMessage.ERROR_ENTER_TIME);
-        //设备状态变更
-        //灯 座位
-        String[] seatIds = order.getSeat_ids().split("\\+");
-        for (String seatId : seatIds) {
-            hardwareStateMapper.openByIdAndType(seatId, HardwareTypeEnum.seat.getValue());
-            hardwareStateMapper.openByIdAndType(lightMapper.getLightIdBySeatId(seatId), HardwareTypeEnum.light.getValue());
+        //只有当第一个用户进入时才会打开全部设备
+        if (order.getExisting() == 0) {
+            //设备状态变更
+            //灯 座位
+            String[] seatIds = order.getSeat_ids().split("\\+");
+            for (String seatId : seatIds) {
+                hardwareStateMapper.openByIdAndType(seatId, HardwareTypeEnum.seat.getValue());
+                hardwareStateMapper.openByIdAndType(lightMapper.getLightIdBySeatId(seatId), HardwareTypeEnum.light.getValue());
+            }
         }
+
     }
 
-    private void leaveBar(Order order) throws Exception {
-        orderMapper.finishOrder(order.getId());
-        //todo 调用app后台的结束订单请求 更新app后台的订单状态
-        /*//验证出门时间
-        Calendar rightNow = Calendar.getInstance();
-        int nowHour = rightNow.get(Calendar.HOUR_OF_DAY);
-        if (!order.getScheduled_day().equals(scheduledDaySdf.format(rightNow.getTime()))
-                || !(nowHour <= order.getEnd_hour()))
-            throw new SelfServiceBarWebException(400, ResponseMessage.ERROR, ResponseMessage.ERROR_ENTER_TIME);*/
-        //设备状态变更
-        //灯 座位
-        String[] seatIds = order.getSeat_ids().split("\\+");
-        for (String seatId : seatIds) {
-            hardwareStateMapper.closeByIdAndType(seatId, HardwareTypeEnum.seat.getValue());
-            hardwareStateMapper.closeByIdAndType(lightMapper.getLightIdBySeatId(seatId), HardwareTypeEnum.light.getValue());
-        }
+    private void tempLeaveBar(Order order) throws Exception {
+        int res = orderMapper.reduceExisting(order.getId());
+        if (res != 1)
+            throw new SelfServiceBarWebException(403, ResponseMessage.ERROR, ResponseMessage.INVALID_LEAVING_QRCODE);
     }
 
     public List<Entrance> getEntranceInfo(String token) throws Exception {
@@ -179,6 +153,7 @@ public class EntranceService {
         return entrance;
     }
 
+    //在生成出门二维码时检查是否干净、向app后台结束订单、结束本地订单状态、设备状态更改
     public QRCodeContentResponse genLeaveQRContent(String token) throws Exception {
         //token解析
         DecodedJWT jwt = CommonUtil.phraseJWT(token, "userControlToken", ResponseMessage.INVALID_CONTROL_TOKEN);
@@ -195,12 +170,19 @@ public class EntranceService {
         Map<String, List<String>> monitorRequest = new HashMap<>();
         List<String> seatIds = new ArrayList<>(Arrays.asList(order.getSeat_ids().split("\\+")));
         monitorRequest.put("seatId", seatIds);
-        //todo 调用摄像头检查申请
+        //调用摄像头检查申请
         HttpResponseContent monitorResponse = CommonUtil.sendPost("http://10.108.122.210:5000/project", JSONObject.toJSONString(monitorRequest));
         if (monitorResponse.getContent() == "0")
             throw new SelfServiceBarWebException(403, ResponseMessage.ERROR, ResponseMessage.PLEASE_CLEAN);
-        //todo 向app后台发起结束订单的请求
+        //向app后台发起结束订单的请求
         HttpResponseContent orderResponse = CommonUtil.sendPatch("http://10.108.122.61:8088/orders/finishStatus/" + orderNo + "?uid=" + JSONObject.parseObject(jwt.getSubject()).getString("uid"));
+        //结束本地订单状态
+        orderMapper.finishOrder(order.getId());
+        //设备状态变更
+        for (String seatId : seatIds) {
+            hardwareStateMapper.closeByIdAndType(seatId, HardwareTypeEnum.seat.getValue());
+            hardwareStateMapper.closeByIdAndType(lightMapper.getLightIdBySeatId(seatId), HardwareTypeEnum.light.getValue());
+        }
         //生成二维码内容
         QRCodeContentResponse qrCodeContentResponse = new QRCodeContentResponse();
         Calendar rightNow = Calendar.getInstance();
@@ -215,6 +197,38 @@ public class EntranceService {
         content.put("uid", order.getUser_id());
         content.put("mode", "leave");
         //content.put("admission",order.getSeat_ids().split("\\+").length+"");
+        qrCodeContentResponse.setContent(CommonUtil.createJWT(content, order.getOrder_key(), createTime, expireTime));
+        qrCodeContentResponse.setOrderNo(order.getOrder_no());
+        return qrCodeContentResponse;
+    }
+
+    //获取临时出门二维码
+    public QRCodeContentResponse genTempLeaveQRContent(String token) throws Exception {
+        //token解析
+        DecodedJWT jwt = CommonUtil.phraseJWT(token, "userControlToken", ResponseMessage.INVALID_CONTROL_TOKEN);
+
+        String orderNo = JSONObject.parseObject(jwt.getSubject()).getString("orderNo");
+        Order order = orderMapper.getOrderByOrderNoAndStatus(orderNo);
+        if (order == null)
+            throw new SelfServiceBarWebException(404, ResponseMessage.ERROR, ResponseMessage.ORDER_NOT_NOT_FOUND);
+
+        String barId = JSONObject.parseObject(jwt.getSubject()).getString("barId");
+        if (!Objects.equals(barId, order.getBar_id()))
+            throw new SelfServiceBarWebException(403, ResponseMessage.ERROR, ResponseMessage.INVALID_CONTROL_TOKEN);
+
+        //生成二维码内容
+        QRCodeContentResponse qrCodeContentResponse = new QRCodeContentResponse();
+        Calendar rightNow = Calendar.getInstance();
+        int nowHour = rightNow.get(Calendar.HOUR_OF_DAY);
+        if (!order.getScheduled_day().equals(scheduledDaySdf.format(rightNow.getTime()))
+                || !(nowHour >= order.getBegin_hour() && nowHour <= order.getEnd_hour()))
+            qrCodeContentResponse.setMessage(ResponseMessage.ERROR_LEAVE_TIME);
+        Date createTime = new Date();
+        Date expireTime = new Date(createTime.getTime() + QRExpireTime);
+        Map<String, String> content = new HashMap<>();
+        content.put("orderNo", orderNo);
+        content.put("uid", order.getUser_id());
+        content.put("mode", "tempLeave");
         qrCodeContentResponse.setContent(CommonUtil.createJWT(content, order.getOrder_key(), createTime, expireTime));
         qrCodeContentResponse.setOrderNo(order.getOrder_no());
         return qrCodeContentResponse;
