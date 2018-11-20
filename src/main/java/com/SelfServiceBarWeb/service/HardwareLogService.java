@@ -54,7 +54,7 @@ public class HardwareLogService {
         HardwareLog hardwareLog = new HardwareLog();
         hardwareLog.setDevice_id(createLogRequest.getDevice_id());
         hardwareLog.setType(createLogRequest.getType().getValue());
-        hardwareLog.setAffair(HardwareStateEnum.repair.getValue());
+        hardwareLog.setAffair(createLogRequest.getAffair().getValue());
         hardwareLog.setComment(createLogRequest.getComment());
         hardwareLog.setUser("administer");
 

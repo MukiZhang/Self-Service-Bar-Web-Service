@@ -1,5 +1,6 @@
 package com.SelfServiceBarWeb.model.request;
 
+import com.SelfServiceBarWeb.model.HardwareStateEnum;
 import com.SelfServiceBarWeb.model.HardwareTypeEnum;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -10,6 +11,9 @@ public class CreateLogRequest {
 
     @ApiModelProperty(value = "硬件种类")
     private HardwareTypeEnum type;
+
+    @ApiModelProperty(value = "日志种类")
+    private HardwareStateEnum affair;
 
     @ApiModelProperty(value = "备注")
     private String comment;
@@ -47,5 +51,13 @@ public class CreateLogRequest {
 
     public void setDevice_id(String device_id) {
         this.device_id = device_id;
+    }
+
+    public HardwareStateEnum getAffair() {
+        return affair;
+    }
+
+    public void setAffair(HardwareStateEnum affair) {
+        this.affair = affair;
     }
 }
