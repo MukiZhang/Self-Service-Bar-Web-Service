@@ -30,23 +30,13 @@ public class MonitorService {
         this.hardwareLogMapper = hardwareLogMapper;
     }
 
-    private List<HardwareLog> getHardwareLog(String id) {
-        List<HardwareLog> hardwareLogs = hardwareLogMapper.getAllByIdAndType(id, HardwareTypeEnum.monitor.getValue());
-        List<HardwareLog> logs = new ArrayList<>();
-
-        for (int i = hardwareLogs.size() - 1; i >= 0 && i >= hardwareLogs.size() - 10; i--) {
-            logs.add(hardwareLogs.get(i));
-        }
-        return logs;
-    }
-
     public List<Monitor> getAllMonitors(String token) throws Exception {
         administratorService.getAdministratorIdFromToken(token);
         List<Monitor> monitors = monitorMapper.getAll();
         for (Monitor monitor : monitors) {
             Hardware monitorState = hardwareStateMapper.getByIdAndType(monitor.getId(), HardwareTypeEnum.monitor.getValue());
             monitor.setState(HardwareStateEnum.getHardwareStateEnum(monitorState.getState()));
-            monitor.setHardwareLogs(getHardwareLog(monitor.getId()));
+            monitor.setHardwareLogs(hardwareLogMapper.getRecentByIdAndType(monitor.getId(), HardwareTypeEnum.monitor.getValue()));
         }
 
         return monitors;
@@ -61,7 +51,7 @@ public class MonitorService {
 
         Hardware monitorState = hardwareStateMapper.getByIdAndType(monitor.getId(), HardwareTypeEnum.monitor.getValue());
         monitor.setState(HardwareStateEnum.getHardwareStateEnum(monitorState.getState()));
-        monitor.setHardwareLogs(getHardwareLog(monitor.getId()));
+        monitor.setHardwareLogs(hardwareLogMapper.getRecentByIdAndType(monitor.getId(), HardwareTypeEnum.monitor.getValue()));
 
         return monitor;
     }
@@ -96,7 +86,7 @@ public class MonitorService {
         HardwareLog hardwareLog = new HardwareLog(monitor.getId(), HardwareTypeEnum.monitor.getValue(), "administer", HardwareStateEnum.create.getValue(), "");
         hardwareLogMapper.createNewLog(hardwareLog);
 
-        monitor.setHardwareLogs(getHardwareLog(monitor.getId()));
+        monitor.setHardwareLogs(hardwareLogMapper.getRecentByIdAndType(monitor.getId(), HardwareTypeEnum.monitor.getValue()));
 
         return monitor;
     }
@@ -123,7 +113,7 @@ public class MonitorService {
                 hardwareLogMapper.createNewLog(hardwareLog);
                 break;
         }
-        monitor.setHardwareLogs(getHardwareLog(monitor.getId()));
+        monitor.setHardwareLogs(hardwareLogMapper.getRecentByIdAndType(monitor.getId(), HardwareTypeEnum.monitor.getValue()));
 
         return monitor;
     }

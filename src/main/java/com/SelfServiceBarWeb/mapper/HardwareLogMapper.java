@@ -22,4 +22,7 @@ public interface HardwareLogMapper {
 
     @Select("SELECT * FROM hardware_use_log;")
     List<HardwareLog> getAll();
+
+    @Select("SELECT * FROM hardware_use_log WHERE type=#{type} AND device_id=#{device_id} order by id desc limit 0,10;")
+    List<HardwareLog> getRecentByIdAndType(@Param("device_id") String device_id, @Param("type") Integer type);
 }

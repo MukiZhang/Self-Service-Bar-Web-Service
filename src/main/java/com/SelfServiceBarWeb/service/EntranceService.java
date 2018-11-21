@@ -133,23 +133,13 @@ public class EntranceService {
         }
     }
 
-    private List<HardwareLog> getHardwareLog(String id) {
-        List<HardwareLog> hardwareLogs = hardwareLogMapper.getAllByIdAndType(id, HardwareTypeEnum.entrance.getValue());
-        List<HardwareLog> logs = new ArrayList<>();
-
-        for (int i = hardwareLogs.size() - 1; i >= 0 && i >= hardwareLogs.size() - 10; i--) {
-            logs.add(hardwareLogs.get(i));
-        }
-        return logs;
-    }
-
     public List<Entrance> getEntranceInfo(String token) throws Exception {
         List<Entrance> entrances = new ArrayList<>();
         administratorService.getAdministratorIdFromToken(token);
         Hardware hardware = hardwareStateMapper.getByIdAndType(entranceId, HardwareTypeEnum.entrance.getValue());
         Entrance entrance = entranceMapper.getEntranceInfo(entranceId);
         entrance.setState(HardwareStateEnum.getHardwareStateEnum(hardware.getState()));
-        entrance.setHardwareLogs(getHardwareLog(entrance.getId()));
+        entrance.setHardwareLogs(hardwareLogMapper.getRecentByIdAndType(entrance.getId(), HardwareTypeEnum.entrance.getValue()));
         entrances.add(entrance);
         return entrances;
     }
@@ -191,7 +181,7 @@ public class EntranceService {
         }
         Hardware hardware = hardwareStateMapper.getByIdAndType(entranceId, HardwareTypeEnum.entrance.getValue());
         entrance.setState(HardwareStateEnum.getHardwareStateEnum(hardware.getState()));
-        entrance.setHardwareLogs(getHardwareLog(entrance.getId()));
+        entrance.setHardwareLogs(hardwareLogMapper.getRecentByIdAndType(entrance.getId(), HardwareTypeEnum.entrance.getValue()));
         return entrance;
     }
 

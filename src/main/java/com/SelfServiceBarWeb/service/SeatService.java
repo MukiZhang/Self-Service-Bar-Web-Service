@@ -38,16 +38,6 @@ public class SeatService {
         this.hardwareLogMapper = hardwareLogMapper;
     }
 
-    private List<HardwareLog> getHardwareLog(String id) {
-        List<HardwareLog> hardwareLogs = hardwareLogMapper.getAllByIdAndType(id, HardwareTypeEnum.seat.getValue());
-        List<HardwareLog> logs = new ArrayList<>();
-
-        for (int i = hardwareLogs.size() - 1; i >= 0 && i >= hardwareLogs.size() - 10; i--) {
-            logs.add(hardwareLogs.get(i));
-        }
-        return logs;
-    }
-
     public List<Seat> getAllSeats(String token) throws Exception {
         administratorService.getAdministratorIdFromToken(token);
 
@@ -55,7 +45,7 @@ public class SeatService {
         for (Seat seat : seats) {
             Hardware monitorState = hardwareStateMapper.getByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue());
             seat.setState(HardwareStateEnum.getHardwareStateEnum(monitorState.getState()));
-            seat.setHardwareLogs(getHardwareLog(seat.getId()));
+            seat.setHardwareLogs(hardwareLogMapper.getRecentByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue()));
         }
         return seats;
     }
@@ -65,7 +55,7 @@ public class SeatService {
         for (Seat seat : seats) {
             Hardware monitorState = hardwareStateMapper.getByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue());
             seat.setState(HardwareStateEnum.getHardwareStateEnum(monitorState.getState()));
-            seat.setHardwareLogs(getHardwareLog(seat.getId()));
+            seat.setHardwareLogs(hardwareLogMapper.getRecentByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue()));
         }
         return seats;
     }
@@ -80,7 +70,7 @@ public class SeatService {
 
         Hardware monitorState = hardwareStateMapper.getByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue());
         seat.setState(HardwareStateEnum.getHardwareStateEnum(monitorState.getState()));
-        seat.setHardwareLogs(getHardwareLog(seat.getId()));
+        seat.setHardwareLogs(hardwareLogMapper.getRecentByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue()));
 
         return seat;
     }
@@ -125,7 +115,7 @@ public class SeatService {
         HardwareLog hardwareLog = new HardwareLog(seat.getId(), HardwareTypeEnum.seat.getValue(), "administer", HardwareStateEnum.create.getValue(), "");
         hardwareLogMapper.createNewLog(hardwareLog);
 
-        seat.setHardwareLogs(getHardwareLog(seat.getId()));
+        seat.setHardwareLogs(hardwareLogMapper.getRecentByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue()));
 
         return seat;
     }
@@ -152,7 +142,7 @@ public class SeatService {
                 hardwareLogMapper.createNewLog(hardwareLog);
                 break;
         }
-        seat.setHardwareLogs(getHardwareLog(seat.getId()));
+        seat.setHardwareLogs(hardwareLogMapper.getRecentByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue()));
 
         return seat;
     }

@@ -2,24 +2,26 @@ package com.SelfServiceBarWeb.service;
 
 import com.SelfServiceBarWeb.constant.ResponseMessage;
 import com.SelfServiceBarWeb.mapper.HardwareLogMapper;
+import com.SelfServiceBarWeb.mapper.HardwareStateMapper;
 import com.SelfServiceBarWeb.model.HardwareLog;
-import com.SelfServiceBarWeb.model.HardwareStateEnum;
 import com.SelfServiceBarWeb.model.SelfServiceBarWebException;
 import com.SelfServiceBarWeb.model.request.CreateLogRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
 public class HardwareLogService {
     private final HardwareLogMapper hardwareLogMapper;
+    private final HardwareStateMapper hardwareStateMapper;
     private final AdministratorService administratorService;
 
     @Autowired
-    public HardwareLogService(HardwareLogMapper hardwareLogMapper, AdministratorService administratorService, SeatService seatService) {
+    public HardwareLogService(HardwareLogMapper hardwareLogMapper, HardwareStateMapper hardwareStateMapper, AdministratorService administratorService, SeatService seatService) {
         this.hardwareLogMapper = hardwareLogMapper;
+        this.hardwareStateMapper = hardwareStateMapper;
         this.administratorService = administratorService;
     }
 
@@ -46,11 +48,12 @@ public class HardwareLogService {
             default:
                 throw new SelfServiceBarWebException(403, ResponseMessage.ERROR, ResponseMessage.GET_LOG_INFO_ERROR);
         }
+        Collections.reverse(hardwareLogs);
         return hardwareLogs;
     }
 
     public HardwareLog createNewLog(CreateLogRequest createLogRequest) throws Exception {
-        String administratorId = administratorService.getAdministratorIdFromToken(createLogRequest.getLoginToken());
+        administratorService.getAdministratorIdFromToken(createLogRequest.getLoginToken());
         HardwareLog hardwareLog = new HardwareLog();
         hardwareLog.setDevice_id(createLogRequest.getDevice_id());
         hardwareLog.setType(createLogRequest.getType().getValue());
@@ -62,5 +65,4 @@ public class HardwareLogService {
         hardwareLogMapper.createNewLog(hardwareLog);
         return hardwareLog;
     }
-
 }
