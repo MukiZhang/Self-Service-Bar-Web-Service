@@ -1,5 +1,6 @@
 package com.SelfServiceBarWeb.service;
 
+import com.SelfServiceBarWeb.mapper.HardwareLogMapper;
 import com.SelfServiceBarWeb.mapper.SeatMapper;
 import com.SelfServiceBarWeb.mapper.TableMapper;
 import com.SelfServiceBarWeb.model.Table;
@@ -35,6 +36,9 @@ public class TableService {
         table.setRight_down_x_coordinate(createTableRequest.getRight_down_x_coordinate());
         table.setRight_down_y_coordinate(createTableRequest.getRight_down_y_coordinate());
         table.setLocation(createTableRequest.getLocation());
+        table.setProducer(createTableRequest.getProducer());
+        table.setCreate_at(createTableRequest.getCreate_at());
+        table.setUse_at(createTableRequest.getUse_at());
 
         tableMapper.createNewTable(table);
         return table;

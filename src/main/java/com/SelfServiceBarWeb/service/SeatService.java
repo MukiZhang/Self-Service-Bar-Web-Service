@@ -1,6 +1,7 @@
 package com.SelfServiceBarWeb.service;
 
 import com.SelfServiceBarWeb.constant.ResponseMessage;
+import com.SelfServiceBarWeb.mapper.HardwareLogMapper;
 import com.SelfServiceBarWeb.mapper.HardwareStateMapper;
 import com.SelfServiceBarWeb.mapper.SeatMapper;
 import com.SelfServiceBarWeb.mapper.TableMapper;
@@ -9,9 +10,11 @@ import com.SelfServiceBarWeb.model.*;
 import com.SelfServiceBarWeb.model.request.ChangeSeatRequest;
 import com.SelfServiceBarWeb.model.request.CreateSeatRequest;
 import com.SelfServiceBarWeb.model.request.SeatStateEnum;
+import com.SelfServiceBarWeb.utils.CommonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,13 +27,15 @@ public class SeatService {
     private final TableMapper tableMapper;
     private final AdministratorService administratorService;
     private final HardwareStateMapper hardwareStateMapper;
+    private final HardwareLogMapper hardwareLogMapper;
 
     @Autowired
-    public SeatService(SeatMapper seatMapper, TableMapper tableMapper, AdministratorService administratorService, HardwareStateMapper hardwareStateMapper) {
+    public SeatService(SeatMapper seatMapper, TableMapper tableMapper, AdministratorService administratorService, HardwareStateMapper hardwareStateMapper, HardwareLogMapper hardwareLogMapper) {
         this.seatMapper = seatMapper;
         this.tableMapper = tableMapper;
         this.administratorService = administratorService;
         this.hardwareStateMapper = hardwareStateMapper;
+        this.hardwareLogMapper = hardwareLogMapper;
     }
 
     public List<Seat> getAllSeats(String token) throws Exception {
@@ -40,6 +45,7 @@ public class SeatService {
         for (Seat seat : seats) {
             Hardware monitorState = hardwareStateMapper.getByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue());
             seat.setState(HardwareStateEnum.getHardwareStateEnum(monitorState.getState()));
+            seat.setHardwareLogs(hardwareLogMapper.getRecentByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue()));
         }
         return seats;
     }
@@ -49,6 +55,7 @@ public class SeatService {
         for (Seat seat : seats) {
             Hardware monitorState = hardwareStateMapper.getByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue());
             seat.setState(HardwareStateEnum.getHardwareStateEnum(monitorState.getState()));
+            seat.setHardwareLogs(hardwareLogMapper.getRecentByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue()));
         }
         return seats;
     }
@@ -63,6 +70,7 @@ public class SeatService {
 
         Hardware monitorState = hardwareStateMapper.getByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue());
         seat.setState(HardwareStateEnum.getHardwareStateEnum(monitorState.getState()));
+        seat.setHardwareLogs(hardwareLogMapper.getRecentByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue()));
 
         return seat;
     }
@@ -74,18 +82,40 @@ public class SeatService {
         if (table == null)
             throw new SelfServiceBarWebException(400, ResponseMessage.ERROR, ResponseMessage.CREATE_SEAT_ERROR);
 
+        //TODO：检查座位位置情况
+
         Seat seat = new Seat();
         seat.setHardwareId(createSeatRequest.getHardwareId());
-        seat.setIpAddress(createSeatRequest.getIpAddress());
         seat.setTable_id(createSeatRequest.getTable_id());
         seat.setPosition_x(createSeatRequest.getPosition_x());
         seat.setPosition_y(createSeatRequest.getPosition_y());
         seat.setLocation(createSeatRequest.getLocation());
+        seat.setProducer(createSeatRequest.getProducer());
+        seat.setCreate_at(createSeatRequest.getCreate_at());
+        seat.setUse_at(createSeatRequest.getUse_at());
+
+
+        //自动生成IP地址
+        List<Seat> seats = seatMapper.getAllSeats();
+        long maxIp = CommonUtil.ipToLong("192.168.0.0");
+        for (Seat tempSeat : seats) {
+            long temp = CommonUtil.ipToLong(tempSeat.getIpAddress());
+            if (temp > maxIp)
+                maxIp = temp;
+        }
+        seat.setIpAddress(CommonUtil.longToIP(maxIp + 1));
+
 
         seatMapper.createNewSeat(seat);
         Hardware hardware = new Hardware(seat.getId(), HardwareTypeEnum.seat.getValue());
         hardwareStateMapper.createNewHardwareState(hardware);
         seat.setState(HardwareStateEnum.close);
+
+        //加入日志
+        HardwareLog hardwareLog = new HardwareLog(seat.getId(), HardwareTypeEnum.seat.getValue(), "administer", HardwareStateEnum.create.getValue(), "");
+        hardwareLogMapper.createNewLog(hardwareLog);
+
+        seat.setHardwareLogs(hardwareLogMapper.getRecentByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue()));
 
         return seat;
     }
@@ -94,17 +124,25 @@ public class SeatService {
         administratorService.getAdministratorIdFromToken(changeSeatRequest.getToken());
 
         Seat seat = seatMapper.getBySeatId(seatId);
+        HardwareLog hardwareLog;
         if (seat == null)
             throw new SelfServiceBarWebException(400, ResponseMessage.ERROR, ResponseMessage.GET_SEAT_INFO_ERROR);
         //修改seat状态
         switch (changeSeatRequest.getMode()) {
             case open:
                 hardwareStateMapper.openByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue());
+                //加入日志
+                hardwareLog = new HardwareLog(seat.getId(), HardwareTypeEnum.seat.getValue(), "administer", HardwareStateEnum.open.getValue(), "");
+                hardwareLogMapper.createNewLog(hardwareLog);
                 break;
             case close:
                 hardwareStateMapper.closeByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue());
+                //加入日志
+                hardwareLog = new HardwareLog(seat.getId(), HardwareTypeEnum.seat.getValue(), "administer", HardwareStateEnum.close.getValue(), "");
+                hardwareLogMapper.createNewLog(hardwareLog);
                 break;
         }
+        seat.setHardwareLogs(hardwareLogMapper.getRecentByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue()));
 
         return seat;
     }

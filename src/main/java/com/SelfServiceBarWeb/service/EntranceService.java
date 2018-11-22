@@ -1,10 +1,7 @@
 package com.SelfServiceBarWeb.service;
 
 import com.SelfServiceBarWeb.constant.ResponseMessage;
-import com.SelfServiceBarWeb.mapper.EntranceMapper;
-import com.SelfServiceBarWeb.mapper.HardwareStateMapper;
-import com.SelfServiceBarWeb.mapper.LightMapper;
-import com.SelfServiceBarWeb.mapper.OrderMapper;
+import com.SelfServiceBarWeb.mapper.*;
 import com.SelfServiceBarWeb.model.*;
 import com.SelfServiceBarWeb.model.request.EntranceStateEnum;
 import com.SelfServiceBarWeb.model.response.HttpResponseContent;
@@ -27,6 +24,7 @@ public class EntranceService {
     private final OrderMapper orderMapper;
     private final HardwareStateMapper hardwareStateMapper;
     private final LightMapper lightMapper;
+    private final HardwareLogMapper hardwareLogMapper;
     private final AdministratorService administratorService;
 
     private static final SimpleDateFormat mysqlSdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -35,11 +33,12 @@ public class EntranceService {
     private static final Integer QRExpireTime = 1000 * 60 * 5;
 
     @Autowired
-    public EntranceService(EntranceMapper entranceMapper, OrderMapper orderMapper, HardwareStateMapper hardwareStateMapper, LightMapper lightMapper, AdministratorService administratorService) {
+    public EntranceService(EntranceMapper entranceMapper, OrderMapper orderMapper, HardwareStateMapper hardwareStateMapper, LightMapper lightMapper, HardwareLogMapper hardwareLogMapper, AdministratorService administratorService) {
         this.entranceMapper = entranceMapper;
         this.orderMapper = orderMapper;
         this.hardwareStateMapper = hardwareStateMapper;
         this.lightMapper = lightMapper;
+        this.hardwareLogMapper = hardwareLogMapper;
         this.administratorService = administratorService;
     }
 
@@ -114,6 +113,7 @@ public class EntranceService {
         Hardware hardware = hardwareStateMapper.getByIdAndType(entranceId, HardwareTypeEnum.entrance.getValue());
         Entrance entrance = entranceMapper.getEntranceInfo(entranceId);
         entrance.setState(HardwareStateEnum.getHardwareStateEnum(hardware.getState()));
+        entrance.setHardwareLogs(hardwareLogMapper.getRecentByIdAndType(entrance.getId(), HardwareTypeEnum.entrance.getValue()));
         entrances.add(entrance);
         return entrances;
     }
@@ -138,18 +138,24 @@ public class EntranceService {
     public Entrance changeEntranceState(String token, EntranceStateEnum entranceStateEnum) throws Exception {
         Entrance entrance = entranceMapper.getEntranceInfo(entranceId);
         administratorService.getAdministratorIdFromToken(token);
+        HardwareLog hardwareLog;
         switch (entranceStateEnum) {
             case open: {
                 hardwareStateMapper.openByIdAndType(entrance.getId(), HardwareTypeEnum.entrance.getValue());
+                hardwareLog = new HardwareLog(entrance.getId(), HardwareTypeEnum.entrance.getValue(), "administer", HardwareStateEnum.open.getValue(), "");
+                hardwareLogMapper.createNewLog(hardwareLog);
                 break;
             }
             case close: {
                 hardwareStateMapper.closeByIdAndType(entrance.getId(), HardwareTypeEnum.entrance.getValue());
+                hardwareLog = new HardwareLog(entrance.getId(), HardwareTypeEnum.entrance.getValue(), "administer", HardwareStateEnum.close.getValue(), "");
+                hardwareLogMapper.createNewLog(hardwareLog);
                 break;
             }
         }
         Hardware hardware = hardwareStateMapper.getByIdAndType(entranceId, HardwareTypeEnum.entrance.getValue());
         entrance.setState(HardwareStateEnum.getHardwareStateEnum(hardware.getState()));
+        entrance.setHardwareLogs(hardwareLogMapper.getRecentByIdAndType(entrance.getId(), HardwareTypeEnum.entrance.getValue()));
         return entrance;
     }
 
