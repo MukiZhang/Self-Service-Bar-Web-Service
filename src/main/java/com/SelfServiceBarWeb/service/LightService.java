@@ -171,7 +171,7 @@ public class LightService {
                 break;
             }
             case setColorTemperature: {
-                if (changeLightRequest.getColor_temperature() < 0 || changeLightRequest.getColor_temperature() > 100)
+                if (changeLightRequest.getColor_temperature() < 2700 || changeLightRequest.getColor_temperature() > 6500)
                     throw new SelfServiceBarWebException(400, ResponseMessage.ERROR, ResponseMessage.ERROR_PARAM);
                 hardwareStateMapper.setColorTemperatureByIdAndType(changeLightRequest.getColor_temperature(), lightId, HardwareTypeEnum.light.getValue());
 
