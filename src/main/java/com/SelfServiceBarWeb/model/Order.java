@@ -44,6 +44,17 @@ public class Order {
     @ApiModelProperty(value = "是否完成无残留物验证标志位")
     private Integer clean;
 
+    @ApiModelProperty(value = "该订单当前已进入人数")
+    private Integer existing;
+
+    public Integer getExisting() {
+        return existing;
+    }
+
+    public void setExisting(Integer existing) {
+        this.existing = existing;
+    }
+
     public Integer getVerify() {
         return verify;
     }

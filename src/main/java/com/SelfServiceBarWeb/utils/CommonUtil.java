@@ -12,6 +12,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPatch;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -59,6 +60,26 @@ public class CommonUtil {
             StringEntity params = new StringEntity(body);
             request.addHeader("content-type", "application/json");
             request.setEntity(params);
+            HttpResponse response = httpClient.execute(request);
+            System.out.println(response.getStatusLine());
+            httpResponseContent.setResponseCode(response.getStatusLine().getStatusCode());
+            HttpEntity entity = response.getEntity();
+            String result = EntityUtils.toString(entity);
+            httpResponseContent.setContent(result);
+        } catch (Exception ex) {
+            throw new SelfServiceBarWebException(500, ResponseMessage.ERROR, ResponseMessage.INNER_SERVER_ERROR);
+        }
+        return httpResponseContent;
+    }
+
+    public static HttpResponseContent sendPatch(String url) {
+        HttpClient httpClient = HttpClientBuilder.create().build(); //Use this instead
+        HttpResponseContent httpResponseContent = new HttpResponseContent();
+        try {
+            HttpPatch request = new HttpPatch(url);
+//            StringEntity params = new StringEntity(body);
+            request.addHeader("content-type", "application/json");
+//            request.setEntity(params);
             HttpResponse response = httpClient.execute(request);
 
             httpResponseContent.setResponseCode(response.getStatusLine().getStatusCode());

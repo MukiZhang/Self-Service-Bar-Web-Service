@@ -45,6 +45,9 @@ public class HardwareLogService {
             case "seats":
                 hardwareLogs = hardwareLogMapper.getAllByType(2);
                 break;
+            case "power_sources":
+                hardwareLogs = hardwareLogMapper.getAllByType(5);
+                break;
             default:
                 throw new SelfServiceBarWebException(403, ResponseMessage.ERROR, ResponseMessage.GET_LOG_INFO_ERROR);
         }

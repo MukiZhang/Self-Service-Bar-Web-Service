@@ -23,9 +23,12 @@ public class ResponseMessage {
 
     public static final String GET_MONITOR_INFO_ERROR = "修改监控状态时发生错误";
 
+    public static final String GET_POWER_SOURCE_INFO_ERROR = "修改电源状态时发生错误";
+
     public static final String GET_LOG_INFO_ERROR = "获取日志时发生错误";
 
     public static final String INVALID_ORDER_TOKEN = "无效的订单token，验证失败";
+    public static final String INVALID_LEAVING_QRCODE = "无效的出门二维码，验证失败";
     public static final String ORDER_NOT_NOT_FOUND = "找不到符合条件的订单";
     public static final String EXCEED_ADMISSION_LIMIT = "超过准入人数限制";
     public static final String ERROR_ENTER_TIME = "进门时间不在预定时间内";
