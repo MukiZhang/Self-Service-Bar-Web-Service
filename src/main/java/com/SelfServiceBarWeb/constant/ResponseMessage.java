@@ -23,6 +23,8 @@ public class ResponseMessage {
 
     public static final String GET_MONITOR_INFO_ERROR = "修改监控状态时发生错误";
 
+    public static final String GET_POWER_SOURCE_INFO_ERROR = "修改电源状态时发生错误";
+
     public static final String GET_LOG_INFO_ERROR = "获取日志时发生错误";
 
     public static final String INVALID_ORDER_TOKEN = "无效的订单token，验证失败";
