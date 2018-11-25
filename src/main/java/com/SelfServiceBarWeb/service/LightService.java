@@ -80,22 +80,28 @@ public class LightService {
     public Light createNewLight(CreateLightRequest createLightRequest) throws Exception {
         String administratorId = administratorService.getAdministratorIdFromToken(createLightRequest.getLoginToken());
         Light light = new Light();
-        light.setHardware_id(createLightRequest.getHardwareId());
         light.setSeat_id(createLightRequest.getSeatId());
         light.setProducer(createLightRequest.getProducer());
         light.setCreate_at(createLightRequest.getCreate_at());
         light.setUse_at(createLightRequest.getUse_at());
         light.setBar_id(administratorMapper.getBarId(administratorId));
 
-        //自动生成IP地址
+        //自动生成IP地址, 硬件编号
         List<Light> lights = lightMapper.getAll();
         long maxIp = CommonUtil.ipToLong("192.168.3.0");
+        long maxHardwareID = 0;
         for (Light tempLight : lights) {
             long temp = CommonUtil.ipToLong(tempLight.getIp_address());
             if (temp > maxIp)
                 maxIp = temp;
+
+            long tempID = Integer.parseInt(tempLight.getHardware_id());
+            if (tempID > maxHardwareID)
+                maxHardwareID = tempID;
+
         }
         light.setIp_address(CommonUtil.longToIP(maxIp + 1));
+        light.setHardware_id(String.valueOf(maxHardwareID));
 
         lightMapper.createNewLight(light);
 

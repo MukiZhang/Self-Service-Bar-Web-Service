@@ -8,9 +8,6 @@ public class CreateEntranceRequest {
     @ApiModelProperty(value = "门禁的ip地址")
     private String ipAddress;
 
-    @ApiModelProperty(value = "门禁的硬件id")
-    private String hardwareId;
-
     @ApiModelProperty(value = "门禁的位置")
     private String location;
 
@@ -64,14 +61,6 @@ public class CreateEntranceRequest {
 
     public void setIpAddress(String ipAddress) {
         this.ipAddress = ipAddress;
-    }
-
-    public String getHardwareId() {
-        return hardwareId;
-    }
-
-    public void setHardwareId(String hardwareId) {
-        this.hardwareId = hardwareId;
     }
 
     public String getLoginToken() {

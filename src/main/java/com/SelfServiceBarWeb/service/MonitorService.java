@@ -60,22 +60,27 @@ public class MonitorService {
         administratorService.getAdministratorIdFromToken(createMonitorRequest.getLoginToken());
 
         Monitor monitor = new Monitor();
-        monitor.setHardwareId(createMonitorRequest.getHardwareId());
         monitor.setLocation(createMonitorRequest.getLocation());
         monitor.setProducer(createMonitorRequest.getProducer());
         monitor.setCreate_at(createMonitorRequest.getCreate_at());
         monitor.setUse_at(createMonitorRequest.getUse_at());
 
-        //自动生成IP地址
+        //自动生成IP地址, 硬件编号
         List<Monitor> monitors = monitorMapper.getAll();
         long maxIp = CommonUtil.ipToLong("192.168.1.0");
-        for (Monitor tempMonitor : monitors) {
-            long temp = CommonUtil.ipToLong(tempMonitor.getIpAddress());
-            if (temp > maxIp) {
+        long maxHardwareID = 0;
+        for (Monitor tempmonitor : monitors) {
+            long temp = CommonUtil.ipToLong(tempmonitor.getIpAddress());
+            if (temp > maxIp)
                 maxIp = temp;
-            }
+
+            long tempID = Integer.parseInt(tempmonitor.getHardwareId());
+            if (tempID > maxHardwareID)
+                maxHardwareID = tempID;
+
         }
         monitor.setIpAddress(CommonUtil.longToIP(maxIp + 1));
+        monitor.setHardwareId(String.valueOf(maxHardwareID));
 
         monitorMapper.createNewMonitor(monitor);
         Hardware hardware = new Hardware(monitor.getId(), HardwareTypeEnum.monitor.getValue());

@@ -10,9 +10,6 @@ import java.sql.Timestamp;
  */
 public class CreateLightRequest {
 
-    @ApiModelProperty(value = "灯的硬件id")
-    private String hardwareId;
-
     @ApiModelProperty(value = "所属座位id")
     private String seatId;
 
@@ -69,14 +66,6 @@ public class CreateLightRequest {
 
     public void setBarId(String barId) {
         this.barId = barId;
-    }
-
-    public String getHardwareId() {
-        return hardwareId;
-    }
-
-    public void setHardwareId(String hardwareId) {
-        this.hardwareId = hardwareId;
     }
 
     public String getLoginToken() {

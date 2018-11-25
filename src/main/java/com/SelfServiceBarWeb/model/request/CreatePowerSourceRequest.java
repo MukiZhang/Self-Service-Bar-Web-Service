@@ -6,10 +6,6 @@ import io.swagger.annotations.ApiModelProperty;
 import java.sql.Timestamp;
 
 public class CreatePowerSourceRequest {
-
-    @ApiModelProperty(value = "电源的硬件id")
-    private String hardwareId;
-
     @ApiModelProperty(value = "所属座位id")
     private String seatId;
 
@@ -58,14 +54,6 @@ public class CreatePowerSourceRequest {
 
     public void setSeatId(String seatId) {
         this.seatId = seatId;
-    }
-
-    public String getHardwareId() {
-        return hardwareId;
-    }
-
-    public void setHardwareId(String hardwareId) {
-        this.hardwareId = hardwareId;
     }
 
     public String getLoginToken() {

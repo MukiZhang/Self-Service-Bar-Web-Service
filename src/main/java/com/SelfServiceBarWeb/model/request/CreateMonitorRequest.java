@@ -6,9 +6,6 @@ import java.sql.Timestamp;
 
 public class CreateMonitorRequest {
 
-    @ApiModelProperty(value = "监控的硬件id")
-    private String hardwareId;
-
     @ApiModelProperty(value = "监控的位置")
     private String location;
 
@@ -54,14 +51,6 @@ public class CreateMonitorRequest {
 
     public void setLocation(String location) {
         this.location = location;
-    }
-
-    public String getHardwareId() {
-        return hardwareId;
-    }
-
-    public void setHardwareId(String hardwareId) {
-        this.hardwareId = hardwareId;
     }
 
     public String getLoginToken() {

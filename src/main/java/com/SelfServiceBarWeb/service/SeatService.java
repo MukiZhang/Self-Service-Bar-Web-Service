@@ -43,8 +43,8 @@ public class SeatService {
 
         List<Seat> seats = seatMapper.getAllSeats();
         for (Seat seat : seats) {
-            Hardware monitorState = hardwareStateMapper.getByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue());
-            seat.setState(HardwareStateEnum.getHardwareStateEnum(monitorState.getState()));
+            Hardware seatState = hardwareStateMapper.getByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue());
+            seat.setState(HardwareStateEnum.getHardwareStateEnum(seatState.getState()));
             seat.setHardwareLogs(hardwareLogMapper.getRecentByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue()));
         }
         return seats;
@@ -53,8 +53,8 @@ public class SeatService {
     public List<Seat> getByTableId(String tableId) throws Exception {
         List<Seat> seats = seatMapper.getByTableId(tableId);
         for (Seat seat : seats) {
-            Hardware monitorState = hardwareStateMapper.getByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue());
-            seat.setState(HardwareStateEnum.getHardwareStateEnum(monitorState.getState()));
+            Hardware seatState = hardwareStateMapper.getByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue());
+            seat.setState(HardwareStateEnum.getHardwareStateEnum(seatState.getState()));
             seat.setHardwareLogs(hardwareLogMapper.getRecentByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue()));
         }
         return seats;
@@ -68,8 +68,8 @@ public class SeatService {
         if (seat == null)
             throw new SelfServiceBarWebException(400, ResponseMessage.ERROR, ResponseMessage.GET_SEAT_INFO_ERROR);
 
-        Hardware monitorState = hardwareStateMapper.getByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue());
-        seat.setState(HardwareStateEnum.getHardwareStateEnum(monitorState.getState()));
+        Hardware seatState = hardwareStateMapper.getByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue());
+        seat.setState(HardwareStateEnum.getHardwareStateEnum(seatState.getState()));
         seat.setHardwareLogs(hardwareLogMapper.getRecentByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue()));
 
         return seat;
@@ -85,7 +85,6 @@ public class SeatService {
         //TODO：检查座位位置情况
 
         Seat seat = new Seat();
-        seat.setHardwareId(createSeatRequest.getHardwareId());
         seat.setTable_id(createSeatRequest.getTable_id());
         seat.setPosition_x(createSeatRequest.getPosition_x());
         seat.setPosition_y(createSeatRequest.getPosition_y());
@@ -94,17 +93,22 @@ public class SeatService {
         seat.setCreate_at(createSeatRequest.getCreate_at());
         seat.setUse_at(createSeatRequest.getUse_at());
 
-
-        //自动生成IP地址
+        //自动生成IP地址, 硬件编号
         List<Seat> seats = seatMapper.getAllSeats();
         long maxIp = CommonUtil.ipToLong("192.168.0.0");
-        for (Seat tempSeat : seats) {
-            long temp = CommonUtil.ipToLong(tempSeat.getIpAddress());
+        long maxHardwareID = 0;
+        for (Seat tempseat : seats) {
+            long temp = CommonUtil.ipToLong(tempseat.getIpAddress());
             if (temp > maxIp)
                 maxIp = temp;
+
+            long tempID = Integer.parseInt(tempseat.getHardwareId());
+            if (tempID > maxHardwareID)
+                maxHardwareID = tempID;
+
         }
         seat.setIpAddress(CommonUtil.longToIP(maxIp + 1));
-
+        seat.setHardwareId(String.valueOf(maxHardwareID));
 
         seatMapper.createNewSeat(seat);
         Hardware hardware = new Hardware(seat.getId(), HardwareTypeEnum.seat.getValue());
