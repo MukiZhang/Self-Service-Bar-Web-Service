@@ -27,8 +27,8 @@ public class EntranceService {
     private final HardwareLogMapper hardwareLogMapper;
     private final AdministratorService administratorService;
 
-    private static final SimpleDateFormat mysqlSdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private static final SimpleDateFormat scheduledDaySdf = new SimpleDateFormat("yyyy-MM-dd");
+    private static final String mysqlSdfPatternString = "yyyy-MM-dd HH:mm:ss";
+    private static final String scheduledDaySdfPatternString = "yyyy-MM-dd";
     private static final String entranceId = "12100";
     private static final Integer QRExpireTime = 1000 * 60 * 5;
 
@@ -75,6 +75,7 @@ public class EntranceService {
     }
 
     private void enterBar(Order order) throws Exception {
+        SimpleDateFormat scheduledDaySdf = new SimpleDateFormat(scheduledDaySdfPatternString);
         //更新订单验证成功标志，之后根据这个字段是否为1返回门禁信息
         orderMapper.updateVerify(order.getId());
         //增加进门人数
@@ -119,6 +120,7 @@ public class EntranceService {
     }
 
     public String getDeviceControlToken(String orderNo) throws Exception {
+        SimpleDateFormat mysqlSdf = new java.text.SimpleDateFormat(mysqlSdfPatternString);
         Entrance entrance = entranceMapper.getEntranceInfo(entranceId);
         Order order = orderMapper.getOrderByOrderNoAndVerify(orderNo);
         if (order == null)
@@ -161,6 +163,7 @@ public class EntranceService {
 
     //在生成出门二维码时检查是否干净、向app后台结束订单、结束本地订单状态、设备状态更改
     public QRCodeContentResponse genLeaveQRContent(String token) throws Exception {
+        SimpleDateFormat scheduledDaySdf = new SimpleDateFormat(scheduledDaySdfPatternString);
         //token解析
         DecodedJWT jwt = CommonUtil.phraseJWT(token, "userControlToken", ResponseMessage.INVALID_CONTROL_TOKEN);
 
@@ -172,18 +175,24 @@ public class EntranceService {
         String barId = JSONObject.parseObject(jwt.getSubject()).getString("barId");
         if (!Objects.equals(barId, order.getBar_id()))
             throw new SelfServiceBarWebException(403, ResponseMessage.ERROR, ResponseMessage.INVALID_CONTROL_TOKEN);
-
-        Map<String, List<String>> monitorRequest = new HashMap<>();
         List<String> seatIds = new ArrayList<>(Arrays.asList(order.getSeat_ids().split("\\+")));
-        monitorRequest.put("seatId", seatIds);
-        //调用摄像头检查申请
-        HttpResponseContent monitorResponse = CommonUtil.sendPost("http://10.108.122.210:5000/project", JSONObject.toJSONString(monitorRequest));
-        if (monitorResponse.getContent() == "0")
-            throw new SelfServiceBarWebException(403, ResponseMessage.ERROR, ResponseMessage.PLEASE_CLEAN);
+
+        /*//第一次请求时检查桌子状态  如果不干净直接返回403
+        if(order.getLeave_request()==0){
+            orderMapper.updateRequest(order.getId());
+            Map<String, List<String>> monitorRequest = new HashMap<>();
+            monitorRequest.put("seatId", seatIds);
+            //调用摄像头检查申请
+            HttpResponseContent monitorResponse = CommonUtil.sendPost("http://10.108.122.210:5000/project", JSONObject.toJSONString(monitorRequest));
+            if (monitorResponse.getContent().equals("0"))
+                throw new SelfServiceBarWebException(403, ResponseMessage.ERROR, ResponseMessage.PLEASE_CLEAN);
+        }*/
         //向app后台发起结束订单的请求
         HttpResponseContent orderResponse = CommonUtil.sendPatch("http://10.108.122.61:8088/orders/finishStatus/" + orderNo + "?uid=" + JSONObject.parseObject(jwt.getSubject()).getString("uid"));
         //结束本地订单状态
         orderMapper.finishOrder(order.getId());
+
+
         //设备状态变更
         for (String seatId : seatIds) {
             hardwareStateMapper.closeByIdAndType(seatId, HardwareTypeEnum.seat.getValue());
@@ -210,6 +219,7 @@ public class EntranceService {
 
     //获取临时出门二维码
     public QRCodeContentResponse genTempLeaveQRContent(String token) throws Exception {
+        SimpleDateFormat scheduledDaySdf = new SimpleDateFormat(scheduledDaySdfPatternString);
         //token解析
         DecodedJWT jwt = CommonUtil.phraseJWT(token, "userControlToken", ResponseMessage.INVALID_CONTROL_TOKEN);
 

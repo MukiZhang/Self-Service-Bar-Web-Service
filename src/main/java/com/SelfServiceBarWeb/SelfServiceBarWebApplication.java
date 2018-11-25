@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * Created by Muki on 2018/11/4
@@ -16,6 +17,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class})
 @EnableAsync
 @MapperScan("com.SelfServiceBarWeb.mapper")
+@EnableScheduling
 public class SelfServiceBarWebApplication {
     public static void main(String[] args) {
         Logger logger = LoggerFactory.getLogger(SelfServiceBarWebApplication.class);

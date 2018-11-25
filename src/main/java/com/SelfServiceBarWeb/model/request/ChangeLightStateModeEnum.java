@@ -6,7 +6,7 @@ package com.SelfServiceBarWeb.model.request;
 public enum ChangeLightStateModeEnum {
     open(1),
     close(2),
-    luminanceOffset(3),
+    //    luminanceOffset(3),
     setLuminance(4),
     setColorTemperature(5);
     private int value;

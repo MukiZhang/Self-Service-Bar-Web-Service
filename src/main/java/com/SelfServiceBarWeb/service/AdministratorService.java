@@ -7,14 +7,11 @@ import com.SelfServiceBarWeb.model.SelfServiceBarWebException;
 import com.SelfServiceBarWeb.model.request.LoginRequest;
 import com.SelfServiceBarWeb.utils.CommonUtil;
 import com.alibaba.fastjson.JSONObject;
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +22,7 @@ import java.util.Objects;
  */
 @Service
 public class AdministratorService {
-    private static final java.text.SimpleDateFormat mysqlSdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static final String mysqlSdfPatternString = "yyyy-MM-dd HH:mm:ss";
 
     private final AdministratorMapper administratorMapper;
 
@@ -35,6 +32,7 @@ public class AdministratorService {
     }
 
     public Administrator login(LoginRequest loginRequest) throws Exception {
+        SimpleDateFormat mysqlSdf = new java.text.SimpleDateFormat(mysqlSdfPatternString);
         Administrator administrator = administratorMapper.getByNameAndPassword(loginRequest.getUserName(), loginRequest.getPassword());
         if (administrator == null)
             throw new SelfServiceBarWebException(403, ResponseMessage.ERROR, ResponseMessage.LOGIN_FAILED);
@@ -63,6 +61,7 @@ public class AdministratorService {
     }
 
     public String getAdministratorIdFromToken(String token) throws Exception {
+        SimpleDateFormat mysqlSdf = new java.text.SimpleDateFormat(mysqlSdfPatternString);
         if (Objects.equals(token, "noToken"))
             throw new SelfServiceBarWebException(403, ResponseMessage.ERROR, ResponseMessage.DO_NOT_LOGIN);
         Date now = new Date();

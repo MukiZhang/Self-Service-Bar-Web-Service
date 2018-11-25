@@ -152,7 +152,7 @@ public class LightService {
                 hardwareLogMapper.createNewLog(hardwareLog);
                 break;
             }
-            case luminanceOffset: {
+            /*case luminanceOffset: {
                 int res = hardwareStateMapper.changeLuminanceByIdAndType(changeLightRequest.getLuminanceValue(), lightId, HardwareTypeEnum.light.getValue());
                 if (res != 1)
                     throw new SelfServiceBarWebException(400, ResponseMessage.ERROR, ResponseMessage.ERROR_PARAM);
@@ -160,7 +160,7 @@ public class LightService {
                 hardwareLog = new HardwareLog(lightId, HardwareTypeEnum.light.getValue(), identity, HardwareStateEnum.change_luminance.getValue(), "" + changeLightRequest.getLuminanceValue());
                 hardwareLogMapper.createNewLog(hardwareLog);
                 break;
-            }
+            }*/
             case setLuminance: {
                 if (changeLightRequest.getLuminanceValue() < 0 || changeLightRequest.getLuminanceValue() > 100)
                     throw new SelfServiceBarWebException(400, ResponseMessage.ERROR, ResponseMessage.ERROR_PARAM);

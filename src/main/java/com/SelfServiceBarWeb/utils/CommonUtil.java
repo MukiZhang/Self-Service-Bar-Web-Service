@@ -69,6 +69,7 @@ public class CommonUtil {
         } catch (Exception ex) {
             throw new SelfServiceBarWebException(500, ResponseMessage.ERROR, ResponseMessage.INNER_SERVER_ERROR);
         }
+        System.out.println(httpResponseContent.getContent());
         return httpResponseContent;
     }
 
