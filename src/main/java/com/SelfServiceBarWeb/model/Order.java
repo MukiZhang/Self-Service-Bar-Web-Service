@@ -47,6 +47,17 @@ public class Order {
     @ApiModelProperty(value = "该订单当前已进入人数")
     private Integer existing;
 
+    @ApiModelProperty(value = "用户是否已经请求过结束订单 获取出门二维码")
+    private Integer leave_request;
+
+    public Integer getLeave_request() {
+        return leave_request;
+    }
+
+    public void setLeave_request(Integer leave_request) {
+        this.leave_request = leave_request;
+    }
+
     public Integer getExisting() {
         return existing;
     }

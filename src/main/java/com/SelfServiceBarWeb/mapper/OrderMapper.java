@@ -37,4 +37,7 @@ public interface OrderMapper {
     @Insert("INSERT INTO order_info(order_no,bar_id,user_id,status,order_key,seat_ids,scheduled_day,begin_hour,end_hour,admission)" +
             " VALUES(#{order_no}, #{bar_id}, #{user_id}, #{status}, #{order_key}, #{seat_ids}, #{scheduled_day}, #{begin_hour}, #{end_hour}, #{admission});")
     void createOrder(CreateOrderRequest orderRequest);
+
+    @Update("UPDATE order_info SET leave_request=1 WHERE id=#{id};")
+    void updateRequest(@Param("id") String orderId);
 }
