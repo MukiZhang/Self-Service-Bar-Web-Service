@@ -47,7 +47,7 @@ public class EntranceService {
     public void QRContentVerify(String QRCodeContent) throws Exception {
         JSONObject jsonObject = JSONObject.parseObject(QRCodeContent);
         String orderNo = jsonObject.getString("orderNo");
-        Order order = orderMapper.getOrderByOrderNoAndStatus(orderNo);
+        Order order = orderMapper.getOrderByOrderNo(orderNo);
         if (order == null)
             throw new SelfServiceBarWebException(404, ResponseMessage.ERROR, ResponseMessage.ORDER_NOT_NOT_FOUND);
         DecodedJWT jwt = CommonUtil.phraseJWT(jsonObject.getString("content"), order.getOrder_key(), ResponseMessage.INVALID_ORDER_TOKEN);
@@ -75,6 +75,8 @@ public class EntranceService {
     }
 
     private void enterBar(Order order) throws Exception {
+        if (order.getStatus() != 2)
+            throw new SelfServiceBarWebException(404, ResponseMessage.ERROR, ResponseMessage.ORDER_NOT_NOT_FOUND);
         SimpleDateFormat scheduledDaySdf = new SimpleDateFormat(scheduledDaySdfPatternString);
         //更新订单验证成功标志，之后根据这个字段是否为1返回门禁信息
         orderMapper.updateVerify(order.getId());

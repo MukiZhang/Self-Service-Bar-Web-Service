@@ -16,6 +16,9 @@ public interface OrderMapper {
     @Select("SELECT * FROM order_info WHERE order_no=#{orderNo} AND status=2;")
     Order getOrderByOrderNoAndStatus(@Param("orderNo") String orderNo);
 
+    @Select("SELECT * FROM order_info WHERE order_no=#{orderNo};")
+    Order getOrderByOrderNo(@Param("orderNo") String orderNo);
+
     @Update("UPDATE order_info SET existing = existing - 1 WHERE id = #{id} AND existing >= 1;")
     int reduceExisting(@Param("id") String orderId);
 
