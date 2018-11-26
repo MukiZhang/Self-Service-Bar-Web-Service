@@ -2,20 +2,19 @@ package com.SelfServiceBarWeb.service;
 
 import com.SelfServiceBarWeb.constant.ResponseMessage;
 import com.SelfServiceBarWeb.mapper.AdministratorMapper;
-import com.SelfServiceBarWeb.model.Administrator;
-import com.SelfServiceBarWeb.model.SelfServiceBarWebException;
+import com.SelfServiceBarWeb.mapper.SeatMapper;
+import com.SelfServiceBarWeb.mapper.TableMapper;
+import com.SelfServiceBarWeb.model.*;
 import com.SelfServiceBarWeb.model.request.LoginRequest;
 import com.SelfServiceBarWeb.utils.CommonUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.google.common.primitives.Ints;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Created by Muki on 2018/11/5
@@ -23,12 +22,17 @@ import java.util.Objects;
 @Service
 public class AdministratorService {
     private static final String mysqlSdfPatternString = "yyyy-MM-dd HH:mm:ss";
-
+    private static final Integer row = 15;
+    private static final Integer column = 25;
     private final AdministratorMapper administratorMapper;
+    private final SeatMapper seatMapper;
+    private final TableMapper tableMapper;
 
     @Autowired
-    public AdministratorService(AdministratorMapper administratorMapper) {
+    public AdministratorService(AdministratorMapper administratorMapper, SeatMapper seatMapper, TableMapper tableMapper) {
         this.administratorMapper = administratorMapper;
+        this.seatMapper = seatMapper;
+        this.tableMapper = tableMapper;
     }
 
     public Administrator login(LoginRequest loginRequest) throws Exception {
@@ -58,6 +62,43 @@ public class AdministratorService {
     public void logout(String token) throws Exception {
         String administratorId = getAdministratorIdFromToken(token);
         administratorMapper.updateTokenCreateTimeById(null, administratorId);
+    }
+
+    public HashMap<String, Object> getLayout(String token) throws Exception {
+        getAdministratorIdFromToken(token);
+        List<List<Integer>> res = new ArrayList<>();
+        int[][] layoutArray = new int[row][column];
+
+        List<Seat> seatPosition = seatMapper.getAllSeatPosition();
+        for (Seat seat : seatPosition) {
+            int x = Integer.valueOf(seat.getPosition_x());
+            int y = Integer.valueOf(seat.getPosition_y());
+            if (x >= row || y >= column)
+                continue;
+            layoutArray[x][y] = 1;
+        }
+
+        List<Table> tablePosition = tableMapper.getAll();
+        for (Table table : tablePosition) {
+            int leftUpX = Integer.valueOf(table.getLeft_up_x_coordinate());
+            int leftUpY = Integer.valueOf(table.getLeft_up_y_coordinate());
+            int rightDownX = Math.min(Integer.valueOf(table.getRight_down_x_coordinate()), row);
+            int rightDownY = Math.min(Integer.valueOf(table.getRight_down_y_coordinate()), column);
+            for (int i = leftUpX; i <= rightDownX; i++) {
+                for (int j = leftUpY; j <= rightDownY; j++)
+                    layoutArray[i][j] = 2;
+            }
+        }
+
+        for (int[] aLayoutArray : layoutArray) {
+            List<Integer> listSub = new ArrayList<>(Ints.asList(aLayoutArray));
+            res.add(listSub);
+        }
+        HashMap<String, Object> resMap = new HashMap<>();
+        resMap.put("layout", res);
+        resMap.put("row", row);
+        resMap.put("column", column);
+        return resMap;
     }
 
     public String getAdministratorIdFromToken(String token) throws Exception {
