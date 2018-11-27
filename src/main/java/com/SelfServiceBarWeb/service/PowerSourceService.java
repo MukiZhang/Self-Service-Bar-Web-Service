@@ -44,23 +44,28 @@ public class PowerSourceService {
         administratorService.getAdministratorIdFromToken(createPowerSourceRequest.getLoginToken());
 
         PowerSource powerSource = new PowerSource();
-        powerSource.setHardware_id(createPowerSourceRequest.getHardwareId());
         powerSource.setSeat_id(createPowerSourceRequest.getSeatId());
         powerSource.setProducer(createPowerSourceRequest.getProducer());
         powerSource.setCreate_at(createPowerSourceRequest.getCreate_at());
         powerSource.setUse_at(createPowerSourceRequest.getUse_at());
         powerSource.setType(createPowerSourceRequest.getType().getValue());
 
-        //自动生成IP地址
+        //自动生成IP地址, 硬件编号
         List<PowerSource> powerSources = powerSourceMapper.getAll();
-        long maxIp = CommonUtil.ipToLong("192.168.1.0");
-        for (PowerSource tempPowerSource : powerSources) {
-            long temp = CommonUtil.ipToLong(tempPowerSource.getIp_address());
-            if (temp > maxIp) {
+        long maxIp = CommonUtil.ipToLong("192.168.4.0");
+        long maxHardwareID = 0;
+        for (PowerSource temppowerSource : powerSources) {
+            long temp = CommonUtil.ipToLong(temppowerSource.getIp_address());
+            if (temp > maxIp)
                 maxIp = temp;
-            }
+
+            long tempID = Integer.parseInt(temppowerSource.getHardware_id());
+            if (tempID > maxHardwareID)
+                maxHardwareID = tempID;
+
         }
         powerSource.setIp_address(CommonUtil.longToIP(maxIp + 1));
+        powerSource.setHardware_id(String.valueOf(maxHardwareID));
 
         powerSourceMapper.createNewPowersource(powerSource);
         Hardware hardware = new Hardware(powerSource.getId(), HardwareTypeEnum.power_source.getValue());

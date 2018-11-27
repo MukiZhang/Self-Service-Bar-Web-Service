@@ -6,9 +6,6 @@ import java.sql.Timestamp;
 
 public class CreateSeatRequest {
 
-    @ApiModelProperty(value = "座位的硬件id")
-    private String hardwareId;
-
     @ApiModelProperty(value = "座位的横坐标")
     private String position_x;
 
@@ -55,14 +52,6 @@ public class CreateSeatRequest {
 
     public void setUse_at(Timestamp use_at) {
         this.use_at = use_at;
-    }
-
-    public String getHardwareId() {
-        return hardwareId;
-    }
-
-    public void setHardwareId(String hardwareId) {
-        this.hardwareId = hardwareId;
     }
 
     public String getLoginToken() {

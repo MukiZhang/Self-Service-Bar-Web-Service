@@ -2,19 +2,17 @@ package com.SelfServiceBarWeb.model.request;
 
 import io.swagger.annotations.ApiModelProperty;
 
-import java.sql.Time;
 import java.sql.Timestamp;
 
-/**
- * Created by Muki on 2018/11/6
- */
-public class CreateLightRequest {
+public class CreateEntranceRequest {
+    @ApiModelProperty(value = "门禁的ip地址")
+    private String ipAddress;
 
-    @ApiModelProperty(value = "所属座位id")
-    private String seatId;
+    @ApiModelProperty(value = "门禁的位置")
+    private String location;
 
-    @ApiModelProperty(value = "所属无人吧id")
-    private String barId;
+    @ApiModelProperty(value = "管理员登录token")
+    private String loginToken;
 
     @ApiModelProperty(value = "生产商")
     private String producer;
@@ -24,9 +22,6 @@ public class CreateLightRequest {
 
     @ApiModelProperty(value = "投入使用时间")
     private Timestamp use_at;
-
-    @ApiModelProperty(value = "管理员登录token")
-    private String loginToken;
 
     public String getProducer() {
         return producer;
@@ -52,20 +47,20 @@ public class CreateLightRequest {
         this.use_at = use_at;
     }
 
-    public String getSeatId() {
-        return seatId;
+    public String getLocation() {
+        return location;
     }
 
-    public void setSeatId(String seatId) {
-        this.seatId = seatId;
+    public void setLocation(String location) {
+        this.location = location;
     }
 
-    public String getBarId() {
-        return barId;
+    public String getIpAddress() {
+        return ipAddress;
     }
 
-    public void setBarId(String barId) {
-        this.barId = barId;
+    public void setIpAddress(String ipAddress) {
+        this.ipAddress = ipAddress;
     }
 
     public String getLoginToken() {
@@ -76,3 +71,4 @@ public class CreateLightRequest {
         this.loginToken = loginToken;
     }
 }
+
