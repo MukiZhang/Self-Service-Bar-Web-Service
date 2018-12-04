@@ -12,6 +12,9 @@ public interface SeatMapper {
     @Select("SELECT * FROM seat_info")
     List<Seat> getAllSeats();
 
+    @Select("SELECT position_x,position_y FROM seat_info")
+    List<Seat> getAllSeatPosition();
+
     @Select("SELECT * FROM seat_info WHERE table_id = #{tableId}")
     List<Seat> getByTableId(@Param("tableId") String tableId);
 

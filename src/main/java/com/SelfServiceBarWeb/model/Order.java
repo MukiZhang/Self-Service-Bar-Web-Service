@@ -21,7 +21,7 @@ public class Order {
     private String user_id;
 
     @ApiModelProperty(value = "订单状态")
-    private String status;
+    private Integer status;
 
     @ApiModelProperty(value = "订单秘钥", hidden = true)
     private String order_key;
@@ -114,11 +114,11 @@ public class Order {
         this.user_id = user_id;
     }
 
-    public String getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 

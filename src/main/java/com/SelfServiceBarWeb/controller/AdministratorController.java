@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+
 /**
  * Created by Muki on 2018/11/5
  */
@@ -36,6 +38,12 @@ public class AdministratorController {
     @RequestMapping(path = "/token", method = RequestMethod.DELETE)
     public void logout(@RequestParam(value = "token", defaultValue = "noToken") String token) throws Exception {
         administratorService.logout(token);
+    }
+
+    @ApiOperation(value = "管理员获取无人吧布局")
+    @RequestMapping(path = "/layout", method = RequestMethod.GET)
+    public HashMap<String, Object> getLayout(@RequestParam(value = "token", defaultValue = "noToken") String token) throws Exception {
+        return administratorService.getLayout(token);
     }
 
 }
