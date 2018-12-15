@@ -73,7 +73,7 @@ public class PowerSourceService {
         powerSource.setState(HardwareStateEnum.close);
 
         //加入日志
-        HardwareLog hardwareLog = new HardwareLog(powerSource.getId(), HardwareTypeEnum.power_source.getValue(), "administer", HardwareStateEnum.create.getValue(), "");
+        HardwareLog hardwareLog = new HardwareLog(powerSource.getId(), HardwareTypeEnum.power_source.getValue(), ResponseMessage.ADMINISTER, HardwareStateEnum.create.getValue(), "");
         hardwareLogMapper.createNewLog(hardwareLog);
 
         powerSource.setHardwareLogs(hardwareLogMapper.getRecentByIdAndType(powerSource.getId(), HardwareTypeEnum.power_source.getValue()));
@@ -93,13 +93,13 @@ public class PowerSourceService {
             case open:
                 hardwareStateMapper.openByIdAndType(powerSource.getId(), HardwareTypeEnum.power_source.getValue());
                 //加入日志
-                hardwareLog = new HardwareLog(powerSource.getId(), HardwareTypeEnum.power_source.getValue(), "administer", HardwareStateEnum.open.getValue(), "");
+                hardwareLog = new HardwareLog(powerSource.getId(), HardwareTypeEnum.power_source.getValue(), ResponseMessage.ADMINISTER, HardwareStateEnum.open.getValue(), "");
                 hardwareLogMapper.createNewLog(hardwareLog);
                 break;
             case close:
                 hardwareStateMapper.closeByIdAndType(powerSource.getId(), HardwareTypeEnum.power_source.getValue());
                 //加入日志
-                hardwareLog = new HardwareLog(powerSource.getId(), HardwareTypeEnum.power_source.getValue(), "administer", HardwareStateEnum.close.getValue(), "");
+                hardwareLog = new HardwareLog(powerSource.getId(), HardwareTypeEnum.power_source.getValue(), ResponseMessage.ADMINISTER, HardwareStateEnum.close.getValue(), "");
                 hardwareLogMapper.createNewLog(hardwareLog);
                 break;
         }
