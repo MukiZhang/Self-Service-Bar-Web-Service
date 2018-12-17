@@ -50,6 +50,17 @@ public class Order {
     @ApiModelProperty(value = "用户是否已经请求过结束订单 获取出门二维码")
     private Integer leave_request;
 
+    @ApiModelProperty(value = "续时后的结束小时")
+    private Integer renewal_end_hour;
+
+    public Integer getRenewal_end_hour() {
+        return renewal_end_hour;
+    }
+
+    public void setRenewal_end_hour(Integer renewal_end_hour) {
+        this.renewal_end_hour = renewal_end_hour;
+    }
+
     public Integer getLeave_request() {
         return leave_request;
     }
