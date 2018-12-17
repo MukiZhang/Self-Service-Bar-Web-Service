@@ -31,7 +31,7 @@ public class LightController {
     }
 
     //该请求可能是用户调用  或者是管理员调用
-    @ApiOperation(value = "获取指定id的灯光信息(管理员)")
+    @ApiOperation(value = "获取指定id的灯光信息(管理员、pad, pad的灯光id在token里面)")
     @RequestMapping(path = "/{lightId}", method = RequestMethod.GET)
     public Light getLightInfo(@PathVariable(value = "lightId") String lightId, @RequestParam(value = "token") String token, @RequestParam(value = "tokenType") TokenTypeEnum tokenTypeEnum) throws Exception {
         return lightService.getLightInfo(lightId, token, tokenTypeEnum);
@@ -52,7 +52,7 @@ public class LightController {
 
     //todo  暂时不知道灯的控制方式，在更改状态时需要传递的参数
     //该请求可能是用户调用  或者是管理员调用
-    @ApiOperation(value = "更改灯的状态(用户、管理员)")
+    @ApiOperation(value = "更改灯的状态(用户、管理员、pad)")
     @RequestMapping(path = "/{lightId}", method = RequestMethod.PATCH)
     public Light changeLightState(@PathVariable(value = "lightId") String lightId, @RequestBody ChangeLightRequest changeLightRequest) throws Exception {
         return lightService.changeLightState(lightId, changeLightRequest);

@@ -88,7 +88,7 @@ public class MonitorService {
         monitor.setState(HardwareStateEnum.close);
 
         //加入日志
-        HardwareLog hardwareLog = new HardwareLog(monitor.getId(), HardwareTypeEnum.monitor.getValue(), "administer", HardwareStateEnum.create.getValue(), "");
+        HardwareLog hardwareLog = new HardwareLog(monitor.getId(), HardwareTypeEnum.monitor.getValue(), ResponseMessage.ADMINISTER, HardwareStateEnum.create.getValue(), "");
         hardwareLogMapper.createNewLog(hardwareLog);
 
         monitor.setHardwareLogs(hardwareLogMapper.getRecentByIdAndType(monitor.getId(), HardwareTypeEnum.monitor.getValue()));
@@ -108,13 +108,13 @@ public class MonitorService {
             case open:
                 hardwareStateMapper.openByIdAndType(monitor.getId(), HardwareTypeEnum.monitor.getValue());
                 //加入日志
-                hardwareLog = new HardwareLog(monitor.getId(), HardwareTypeEnum.monitor.getValue(), "administer", HardwareStateEnum.open.getValue(), "");
+                hardwareLog = new HardwareLog(monitor.getId(), HardwareTypeEnum.monitor.getValue(), ResponseMessage.ADMINISTER, HardwareStateEnum.open.getValue(), "");
                 hardwareLogMapper.createNewLog(hardwareLog);
                 break;
             case close:
                 hardwareStateMapper.closeByIdAndType(monitor.getId(), HardwareTypeEnum.monitor.getValue());
                 //加入日志
-                hardwareLog = new HardwareLog(monitor.getId(), HardwareTypeEnum.monitor.getValue(), "administer", HardwareStateEnum.close.getValue(), "");
+                hardwareLog = new HardwareLog(monitor.getId(), HardwareTypeEnum.monitor.getValue(), ResponseMessage.ADMINISTER, HardwareStateEnum.close.getValue(), "");
                 hardwareLogMapper.createNewLog(hardwareLog);
                 break;
         }

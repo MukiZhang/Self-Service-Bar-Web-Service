@@ -153,13 +153,13 @@ public class EntranceService {
         switch (entranceStateEnum) {
             case open: {
                 hardwareStateMapper.openByIdAndType(entrance.getId(), HardwareTypeEnum.entrance.getValue());
-                hardwareLog = new HardwareLog(entrance.getId(), HardwareTypeEnum.entrance.getValue(), "administer", HardwareStateEnum.open.getValue(), "");
+                hardwareLog = new HardwareLog(entrance.getId(), HardwareTypeEnum.entrance.getValue(), ResponseMessage.ADMINISTER, HardwareStateEnum.open.getValue(), "");
                 hardwareLogMapper.createNewLog(hardwareLog);
                 break;
             }
             case close: {
                 hardwareStateMapper.closeByIdAndType(entrance.getId(), HardwareTypeEnum.entrance.getValue());
-                hardwareLog = new HardwareLog(entrance.getId(), HardwareTypeEnum.entrance.getValue(), "administer", HardwareStateEnum.close.getValue(), "");
+                hardwareLog = new HardwareLog(entrance.getId(), HardwareTypeEnum.entrance.getValue(), ResponseMessage.ADMINISTER, HardwareStateEnum.close.getValue(), "");
                 hardwareLogMapper.createNewLog(hardwareLog);
                 break;
             }
