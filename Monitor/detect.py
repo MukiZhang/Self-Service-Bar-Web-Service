@@ -28,18 +28,6 @@ def getLoc(seat_id):
 	point2 = (points_float[2], points_float[3])
 	return point1, point2
 
-def subImage(image, point1, point2):
-	# get the sub-image of image, using point1 and point2 to locate
-	# parameter:image: raw image, point1 point2:two vertices of the sub-image
-	
-	min_x = int(min(point1[0],point2[0]))
-	min_y = int(min(point1[1],point2[1]))
-	width = int(abs(point1[0] - point2[0]))
-	height = int(abs(point1[1] -point2[1]))
-	cutImg = image[min_y:min_y+height, min_x:min_x+width]
-	return cutImg
-
-
 def isItemLeft(seat_id_list):
 	# judge there is item left in seat
 	# parameter: seat_id_list, [1, 2, 3]
@@ -48,7 +36,10 @@ def isItemLeft(seat_id_list):
 	# False: no item left
 
 	java_workpath = os.getcwd()
-	python_workpath = java_workpath + '\\Monitor'
+	if java_workpath.find('Monitor') == -1:
+		python_workpath = java_workpath + '\\Monitor'
+	else:
+		python_workpath = java_workpath
 
 	# caputure current picture from camera, save as curr.jpg
 	start = time.time()
@@ -65,7 +56,7 @@ def isItemLeft(seat_id_list):
 		initImage = cv2.imread(python_workpath + '\\init.jpg')
 		currImage = cv2.imread(python_workpath + '\\curr.jpg')
 
-		'''
+		# get the sub-image of image, using point1 and point2 to locate
 		min_x = int(min(point1[0],point2[0]))
 		min_y = int(min(point1[1],point2[1]))
 		width = int(abs(point1[0] - point2[0]))
@@ -73,10 +64,6 @@ def isItemLeft(seat_id_list):
 
 		initCutImage = initImage[min_y:min_y+height, min_x:min_x+width]
 		currCutImage = currImage[min_y:min_y+height, min_x:min_x+width]
-		'''
-
-		initCutImage = subImage[initImage, point1, point2]
-		currCutImage = subImage[currImage, point1, point2]
 		
 		sim = similarity(initCutImage, currCutImage)
 		sim_list.append(sim)
@@ -90,8 +77,11 @@ def isItemLeft(seat_id_list):
 
 def main():
 	# java command to excute python program: python detect.py seat_ids_string seat_ids_loc_string
-	# seat_ids_string: 1003 1004 1005
+	# seat_ids_string: 11003 11004 11005
 	# seat_ids_loc_string:11003 = (642, 296),(734, 516)\n11004 = (495, 204),(624, 320)\n11005 = (283, 134),(440, 251)\n
+	# such as:
+	# seat_ids_string = '11003 11004 11005'
+	# seat_ids_loc_string = '11003 = (642, 296),(734, 516)\n11004 = (495, 204),(624, 320)\n11005 = (283, 134),(440, 251)\n1 = (234, 381),(395, 552)\n2 = (186, 255),(377, 430)'
 
 	# process for seat_ids_string
 	seat_ids_string = sys.argv[1]
@@ -109,9 +99,9 @@ def main():
 		seat_ids_loc[seat_id] = seat_loc_string
 	print('seat_ids_loc(is a dict):', seat_ids_loc)
 	result = isItemLeft(seat_ids)
-	print('Monitor result(is item lefr, True or False):', result)
+	print('Monitor result(no item left?, True or False):', result)
 
-	# return to java using print    0:item left, 1:no item left
+	# return to java using print    1:item left, 0:no item left
 	if result == True:
 		print('0')
 	else:
