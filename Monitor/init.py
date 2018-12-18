@@ -1,23 +1,25 @@
 import os
 import cv2
+import time
 import configparser
-from set_loc import *
-from seat_id import *
+from setSeatLoc import *
+from setSeatId import *
 from similarity import *
 from caputureCamera import *
-import time
 
 # 保存当前图片为init.jpg
 def initImage():
-	caputureCamera(0)
+	path = os.getcwd()
+	if path.find('Monitor') == -1:
+		path += '\\Monitor'
+	caputureCamera(picName='init.jpg', path=path)
 
-# 将seatID对应得point1, point2写入config.ini
+# 将seatID对应得point1, point2写入seat.ini
 def writeSeatLoc(seatID, point1, point2):
 	config = configparser.ConfigParser()
-	config.read('config.ini')
-	# config.add_section('seatLoc')
+	config.read('seat.ini')
 	config.set('seatLoc', seatID, str(point1)+',' +str(point2))
-	config.write(open('config.ini', 'w+'))
+	config.write(open('seat.ini', 'w+'))
 
 # 初始化座位坐标
 def initSeat():
@@ -41,13 +43,16 @@ def modifySeat():
 def delSeat():
 	seatID = dialog(0)
 	config = configparser.ConfigParser()
-	config.read('config.ini')
+	config.read('seat.ini')
 	if seatID not in config['seatLoc'].keys():
 		print('要删除的座位ID不存在')
 	else:
 		config.remove_option('seatLoc', seatID)
-		config.write(open('config.ini','w'))
+		config.write(open('seat.ini','w'))
 
 def init():
 	initImage()
 	initSeat()
+
+if __name__=='__main__':
+	init()

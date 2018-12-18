@@ -25,7 +25,6 @@ def dialog(flag=1):
 	seat.pack()
 
 	Button(root, text='确认', command = on_click).pack()
-	# Button(root, text='取消', command = on_click2).pack()
 	root.mainloop()
 
 	while ID is not None:
@@ -36,10 +35,6 @@ def on_click():
 	global seat_id
 	global ID
 	ID = seat_id.get()
-	root.destroy()
-
-def on_click2():
-	global root
 	root.destroy()
 
 if __name__ == '__main__':

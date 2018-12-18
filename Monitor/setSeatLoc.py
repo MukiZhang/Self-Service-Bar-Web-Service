@@ -1,5 +1,5 @@
 import cv2 
-from seat_id import *
+from setSeatId import *
 
 global img 
 global point1, point2 
@@ -20,22 +20,12 @@ def on_mouse(event, x, y, flags, param):
 		point2 = (x,y) 
 		cv2.rectangle(img2, point1, point2, (0,0,255), 5) 
 		cv2.imshow('image', img2) 
-		# cut_img = sub_image(img, point1, point2)
-		# cv2.imwrite('lena3.jpg', cut_img) 
 		ID = dialog()
 		# print(ID)
 		if point1[0] > point2[0]:
 			point1, point2 = point2, point1
 
 		set_loc[ID] = (point1, point2)
-
-def sub_image(image, point1, point2):
-	min_x = min(point1[0],point2[0]) 
-	min_y = min(point1[1],point2[1]) 
-	width = abs(point1[0] - point2[0]) 
-	height = abs(point1[1] -point2[1]) 
-	cut_img = imgage[min_y:min_y+height, min_x:min_x+width]
-	return cut_img
 
 def set_loc(filename): 
 	global img, set_loc
