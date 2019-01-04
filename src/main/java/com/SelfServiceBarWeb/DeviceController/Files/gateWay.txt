@@ -1,0 +1,1 @@
+G001 10.108.120.117 7000 Light {Ver=1.1.3,-CooVer=-Sep--8-2018,-Command=Response,-Port=7000,-Ip=10.108.120.117,-Model=IHA1211HB,-Data=[],-Code=98999308,-Mac=000D6F000FFDBAE4}
