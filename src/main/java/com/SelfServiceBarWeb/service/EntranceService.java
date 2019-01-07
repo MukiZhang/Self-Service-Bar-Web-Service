@@ -146,6 +146,7 @@ public class EntranceService {
         return CommonUtil.createJWT(content, "userControlToken", createTime, expireTime);
     }
 
+    //todo 门禁状态控制
     public Entrance changeEntranceState(String token, EntranceStateEnum entranceStateEnum) throws Exception {
         Entrance entrance = entranceMapper.getEntranceInfo(entranceId);
         administratorService.getAdministratorIdFromToken(token);
