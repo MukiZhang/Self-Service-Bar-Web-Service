@@ -1,9 +1,7 @@
 package com.SelfServiceBarWeb.DeviceController.Files;
-
 /**
  * Title: ip_id_type.java
  * Description: this class is object of the gateway it contain the information of the ip_id_type.txt.
- *
  * @author Jie Ji
  * @version 1.0
  */

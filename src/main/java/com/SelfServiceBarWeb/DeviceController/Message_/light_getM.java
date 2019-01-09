@@ -1,4 +1,4 @@
-package com.SelfServiceBarWeb.DeviceController.Message_.light;
+package com.SelfServiceBarWeb.DeviceController.Message_;
 
 import com.google.gson.Gson;
 
@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 /**
  * Title: light_getM.java
  * Description: this class is used to process the message received from gateway and generate the sending message.
+ *
  * @author Jie Ji
  * @version 1.0
  */
@@ -29,9 +30,10 @@ public class light_getM {
 
     /**
      * this method is used to generate the control message of light including light temperature, luminance and switch.
+     *
      * @param deviceID the deviceID which used to control
-     * @param value the parameter of the light
-     * @param cType control light temperature 1/ switch 2/ luminance 3
+     * @param value    the parameter of the light
+     * @param cType    control light temperature 1/ switch 2/ luminance 3
      * @return the String in Json from
      */
     public String ColTemp_Swi_Lum(String deviceID, int value, int cType) {
@@ -81,6 +83,7 @@ public class light_getM {
 
     /**
      * this method is used to generate the request message of light to get the recent state.
+     *
      * @param deviceID the deviceID which used to control
      * @return the String in Json from
      */
@@ -112,6 +115,7 @@ public class light_getM {
 
     /**
      * this method is used to generate the request message of gateway to get the state of light which been recorded.
+     *
      * @param deviceID the deviceID which used to control
      * @return the String in Json from
      */
@@ -143,6 +147,7 @@ public class light_getM {
 
     /**
      * this method is used to delete the device in the network
+     *
      * @param deviceID the deviceID which used to control
      * @return the String in Json from
      */
@@ -173,6 +178,7 @@ public class light_getM {
 
     /**
      * this method is used to get the device list which connected with gateway
+     *
      * @return the String in Json from
      */
     public String deviceList() {
@@ -203,6 +209,7 @@ public class light_getM {
 
     /**
      * this method is used to get the message of refectory of light
+     *
      * @return the String in Json from
      */
     public String reFactory() {
@@ -229,6 +236,7 @@ public class light_getM {
 
     /**
      * this method is used to process map object into string in json form
+     *
      * @param mes the map message
      * @return the String in Json from
      */
@@ -245,6 +253,7 @@ public class light_getM {
 
     /**
      * this method is used to process string into Map object
+     *
      * @param jStr
      * @return the map object
      */
@@ -333,8 +342,9 @@ public class light_getM {
 
     /**
      * this method is used to put key and value into map
+     *
      * @param dataM the map used to put key and value into it
-     * @param m4 the string contain the key abd value.
+     * @param m4    the string contain the key abd value.
      */
     void putKeyVal(Map dataM, String m4) {
         String[] ar = m4.split("[\":]");

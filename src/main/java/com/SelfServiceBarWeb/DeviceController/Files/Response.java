@@ -1,22 +1,25 @@
 package com.SelfServiceBarWeb.DeviceController.Files;
+
 /**
- * Title: Respounce.java
+ * Title: Response.java
  * Description: this class is object of the gateway it contain the information of the Respounce.txt.
+ *
  * @author Jie Ji
  * @version 1.0
  */
-public class Respounce {
-    int deviceNo;
-    String type;
-    int result;
-    String respounceInfo;
-    int reType;
-    String date;
+public class Response {
+    private int deviceNo;
+    private String type;
+    private int result;
+    private String respounceInfo;
+    private int reType;
 
-    public Respounce() {
+    private String date;
+
+    public Response() {
     }
 
-    public Respounce(int deviceNo, String type, int result, String respounceInfo, int reType, String date) {
+    public Response(int deviceNo, String type, int result, String respounceInfo, int reType, String date) {
         this.deviceNo = deviceNo;
         this.type = type;
         this.result = result;
@@ -78,18 +81,3 @@ public class Respounce {
         return deviceNo + " " + type + " " + result + " " + respounceInfo + " " + reType;
     }
 }
-/*
-    reType: 1 -search station result:S L T
-                                     0 0 0
-                                     0 0 1
-                                     0 1 0
-                                     1 0 0
-                                     1 0 1
-                                     1 1 0
-                                     0 1 1
-                                     1 1 1
-                                     0:fail
-                                     1:success
-    reType:2 -control result :0:fail 1:success
-
- */

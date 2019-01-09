@@ -43,9 +43,9 @@
 10001 light 111 {ColorTemperature=3400,Luminance=10,Switch=1,DeviceId=000B57FFFEDEEFBD,SofterVersion=20180427} 1 2019-01-05/22:40:34
 10001 light 111 {ColorTemperature=3400,Luminance=10,Switch=1,DeviceId=000B57FFFEDEEFBD,SofterVersion=20180427} 1 2019-01-05/22:40:36
 10001 light 111 {ColorTemperature=3400,Luminance=10,Switch=1,DeviceId=000B57FFFEDEEFBD,SofterVersion=20180427} 1 2019-01-05/23:25:36
-10001 light 0 _____________________________________________________________________________________________ 1 2019-01-06/14:36:33
-10001 light 0 _____________________________________________________________________________________________ 1 2019-01-06/14:36:44
-10001 light 100 {Switch=0} 1 2019-01-09/15:26:53
-10001 light 1 {Type=Attribute,ommand=Report,FrameNumber=00,Data=[{DeviceId=000B57FFFEDEEFBD,Value=0,ModelId=090f77,Key=Switch}]} 2 2019-01-09/15:26:53
-10001 light 100 {Switch=1} 1 2019-01-09/15:34:19
-10001 light 1 {Type=Attribute,ommand=Report,FrameNumber=00,Data=[{DeviceId=000B57FFFEDEEFBD,Value=1,ModelId=090f77,Key=Switch}]} 2 2019-01-09/15:34:19
+10001 light 111 {ColorTemperature=3400,Luminance=10,Switch=0,DeviceId=000B57FFFEDEEFBD,SofterVersion=20180427} 1 2019-01-09/15:35:52
+10001 light 1 {Type=Attribute,ommand=Report,FrameNumber=00,Data=[{DeviceId=000B57FFFEDEEFBD,Value=0,ModelId=090f77,Key=Switch}]} 2 2019-01-09/15:35:52
+10001 light 111 {ColorTemperature=3400,Luminance=10,Switch=1,DeviceId=000B57FFFEDEEFBD,SofterVersion=20180427} 1 2019-01-09/15:35:52
+10001 light 1 {Type=Attribute,ommand=Report,FrameNumber=00,Data=[{DeviceId=000B57FFFEDEEFBD,Value=1,ModelId=090f77,Key=Switch}]} 2 2019-01-09/15:35:52
+10001 light 111 {ColorTemperature=3400,Luminance=80,Switch=1,DeviceId=000B57FFFEDEEFBD,SofterVersion=20180427} 1 2019-01-09/15:35:54
+10001 light 1 {Type=Attribute,ommand=Report,FrameNumber=00,Data=[{DeviceId=000B57FFFEDEEFBD,Value=80,ModelId=090f77,Key=Luminance}]} 2 2019-01-09/15:35:54

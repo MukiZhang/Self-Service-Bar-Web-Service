@@ -1,9 +1,7 @@
 package com.SelfServiceBarWeb.DeviceController.Files;
-
 /**
  * Title: gateWay.java
  * Description: this class is object of the gateway it contain the information of the gateWay.txt.
- *
  * @author Jie Ji
  * @version 1.0
  */
