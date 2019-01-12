@@ -206,7 +206,7 @@ public class EntranceService {
 
         //设备状态变更
         for (String seatId : seatIds) {
-            hardwareStateMapper.closeByIdAndType(seatId, HardwareTypeEnum.seat.getValue());
+            hardwareStateMapper.closeByIdAndType(seatId, HardwareTypeEnum.seat .getValue());
             hardwareStateMapper.closeByIdAndType(lightMapper.getLightIdBySeatId(seatId), HardwareTypeEnum.light.getValue());
         }
         //生成二维码内容
@@ -263,10 +263,10 @@ public class EntranceService {
 
 
     private void detectTable() {
-        String pythonPath = System.getProperty("user.dir").replace('/', '\\') + "\\MonitorDemo\\";
+        String pythonPath = System.getProperty("user.dir").replace('/', '\\') + "\\Monitor\\";
         String seat_loc = "";
         try {
-            File file = new File(pythonPath + "config.ini");
+            File file = new File(pythonPath + "seat.ini");
             InputStreamReader inputReader = new InputStreamReader(new FileInputStream(file));
             BufferedReader bf = new BufferedReader(inputReader);
             // 按行读取字符串
@@ -274,7 +274,7 @@ public class EntranceService {
             String line;
             int i = 0;
             while ((line = bf.readLine()) != null) {
-                if (i >= 6 && line != "\n") {
+                if (i >= 1 && line != "\n") {
                     seat_loc += line + '\n';
                 }
                 i += 1;
@@ -284,9 +284,9 @@ public class EntranceService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println(seat_loc);
+//        System.out.println(seat_loc);
         seat_loc = seat_loc.substring(0, seat_loc.length() - 1);
-        System.out.println(seat_loc);
+//        System.out.println(seat_loc);
 
         String[] seat_ids = {"11003", "11004"};
         String seat_id_string = seat_ids[0];
@@ -295,8 +295,9 @@ public class EntranceService {
         }
 
         String[] strs = new String[]{"python", pythonPath + "detect.py", seat_id_string, seat_loc};
-        System.out.println(strs[2]);
-        System.out.println(strs[3]);
+        System.out.println(pythonPath + "detect.py");
+//        System.out.println(strs[2]);
+//        System.out.println(strs[3]);
 //        System.out.println(seat_id_string);
 //        String[] strs = new String[] { "python", "C:\\Users\\Melon\\Desktop\\python_to_java.py"};
         try {
@@ -305,11 +306,11 @@ public class EntranceService {
             String line = null;
             while ((line = in.readLine()) != null) {
                 System.out.println(line);
-                if (line.equals("True")) {
-                    System.out.println("1");
+                if (line.equals("1")) {
+                    System.out.println("item left");
                     break;
-                } else if (line.equals("False")) {
-                    System.out.println("0");
+                } else if (line.equals("0")) {
+                    System.out.println("no item left");
                     break;
                 }
             }
