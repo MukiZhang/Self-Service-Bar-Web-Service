@@ -7,11 +7,13 @@ import com.SelfServiceBarWeb.model.request.EntranceStateEnum;
 import com.SelfServiceBarWeb.model.response.HttpResponseContent;
 import com.SelfServiceBarWeb.model.response.QRCodeContentResponse;
 import com.SelfServiceBarWeb.utils.CommonUtil;
+import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -45,7 +47,12 @@ public class EntranceService {
     //进门二维码的验证
     //在扫码出入门时进行准入人数的判断
     public void QRContentVerify(String QRCodeContent) throws Exception {
-        JSONObject jsonObject = JSONObject.parseObject(QRCodeContent);
+        JSONObject jsonObject;
+        try {
+            jsonObject = JSONObject.parseObject(QRCodeContent);
+        } catch (JSONException exception) {
+            throw new SelfServiceBarWebException(400, ResponseMessage.ERROR, ResponseMessage.ERROR_PARAM);
+        }
         String orderNo = jsonObject.getString("orderNo");
         Order order = orderMapper.getOrderByOrderNo(orderNo);
         if (order == null)
@@ -139,6 +146,7 @@ public class EntranceService {
         return CommonUtil.createJWT(content, "userControlToken", createTime, expireTime);
     }
 
+    //todo 门禁状态控制
     public Entrance changeEntranceState(String token, EntranceStateEnum entranceStateEnum) throws Exception {
         Entrance entrance = entranceMapper.getEntranceInfo(entranceId);
         administratorService.getAdministratorIdFromToken(token);
@@ -209,7 +217,9 @@ public class EntranceService {
             HttpResponseContent monitorResponse = CommonUtil.sendPost("http://10.108.122.210:5000/project", JSONObject.toJSONString(monitorRequest));
             if (monitorResponse.getContent().equals("0"))
                 throw new SelfServiceBarWebException(403, ResponseMessage.ERROR, ResponseMessage.PLEASE_CLEAN);
+            detectTable();
         }*/
+        detectTable();
         //向app后台发起结束订单的请求
         HttpResponseContent orderResponse = CommonUtil.sendPatch("http://10.108.122.61:8088/orders/finishStatus/" + orderNo + "?uid=" + JSONObject.parseObject(jwt.getSubject()).getString("uid"));
         //结束本地订单状态
@@ -271,6 +281,65 @@ public class EntranceService {
         qrCodeContentResponse.setContent(CommonUtil.createJWT(content, order.getOrder_key(), createTime, expireTime));
         qrCodeContentResponse.setOrderNo(order.getOrder_no());
         return qrCodeContentResponse;
+    }
+
+
+    private void detectTable() {
+        String pythonPath = System.getProperty("user.dir").replace('/', '\\') + "\\MonitorDemo\\";
+        String seat_loc = "";
+        try {
+            File file = new File(pythonPath + "config.ini");
+            InputStreamReader inputReader = new InputStreamReader(new FileInputStream(file));
+            BufferedReader bf = new BufferedReader(inputReader);
+            // 按行读取字符串
+
+            String line;
+            int i = 0;
+            while ((line = bf.readLine()) != null) {
+                if (i >= 6 && line != "\n") {
+                    seat_loc += line + '\n';
+                }
+                i += 1;
+            }
+            bf.close();
+            inputReader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println(seat_loc);
+        seat_loc = seat_loc.substring(0, seat_loc.length() - 1);
+        System.out.println(seat_loc);
+
+        String[] seat_ids = {"11003", "11004"};
+        String seat_id_string = seat_ids[0];
+        for (int i = 1; i < seat_ids.length; i++) {
+            seat_id_string += " " + seat_ids[i];
+        }
+
+        String[] strs = new String[]{"python", pythonPath + "detect.py", seat_id_string, seat_loc};
+        System.out.println(strs[2]);
+        System.out.println(strs[3]);
+//        System.out.println(seat_id_string);
+//        String[] strs = new String[] { "python", "C:\\Users\\Melon\\Desktop\\python_to_java.py"};
+        try {
+            Process pr = Runtime.getRuntime().exec(strs);
+            BufferedReader in = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+            String line = null;
+            while ((line = in.readLine()) != null) {
+                System.out.println(line);
+                if (line.equals("True")) {
+                    System.out.println("1");
+                    break;
+                } else if (line.equals("False")) {
+                    System.out.println("0");
+                    break;
+                }
+            }
+            in.close();
+            pr.waitFor();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }
