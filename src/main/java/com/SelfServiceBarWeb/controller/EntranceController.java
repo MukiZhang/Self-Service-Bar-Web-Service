@@ -51,6 +51,13 @@ public class EntranceController {
         return entranceService.changeEntranceState(token, entranceStateEnum);
     }
 
+    //由管理员调用
+    @ApiOperation(value = "更改所有门禁状态(管理员)")
+    @RequestMapping(path = "/all", method = RequestMethod.PATCH)
+    public boolean changeAllEntranceState(@RequestParam(value = "token") String token, @RequestParam(value = "mode") EntranceStateEnum entranceStateEnum) throws Exception {
+        return entranceService.changeAllEntranceState(token, entranceStateEnum);
+    }
+
     //由门禁调用
     @ApiOperation(value = "验证进门、出门二维码(门禁)")
     @RequestMapping(path = "/verification", method = RequestMethod.POST)

@@ -4,6 +4,7 @@ import com.SelfServiceBarWeb.constant.ResponseMessage;
 import com.SelfServiceBarWeb.mapper.*;
 import com.SelfServiceBarWeb.model.*;
 import com.SelfServiceBarWeb.model.request.ChangeLightRequest;
+import com.SelfServiceBarWeb.model.request.ChangeLightStateModeEnum;
 import com.SelfServiceBarWeb.model.request.CreateLightRequest;
 import com.SelfServiceBarWeb.model.request.TokenTypeEnum;
 import com.SelfServiceBarWeb.utils.CommonUtil;
@@ -123,6 +124,33 @@ public class LightService {
         return light;
     }
 
+    public boolean changeAllLightState(String token, ChangeLightStateModeEnum modeEnum) throws Exception {
+        //验证管理员或用户的身份
+        administratorService.getAdministratorIdFromToken(token);
+        List<Light> lights = lightMapper.getAll();
+
+        for (Light light : lights) {
+            //更改灯的状态
+            switch (modeEnum) {
+                case close: {
+                    hardwareStateMapper.closeByIdAndType(light.getId(), HardwareTypeEnum.light.getValue());
+                    break;
+                }
+                case open: {
+                    hardwareStateMapper.openByIdAndType(light.getId(), HardwareTypeEnum.light.getValue());
+                    break;
+                }
+            }
+        }
+        HardwareLog hardwareLog;
+        if (modeEnum == ChangeLightStateModeEnum.close)
+            hardwareLog = new HardwareLog("99999", HardwareTypeEnum.light.getValue(), "admin", HardwareStateEnum.close.getValue(), "");
+        else
+            hardwareLog = new HardwareLog("99999", HardwareTypeEnum.light.getValue(), "admin", HardwareStateEnum.open.getValue(), "");
+        hardwareLogMapper.createNewLog(hardwareLog);
+
+        return true;
+    }
 
     public Light changeLightState(String lightId, ChangeLightRequest changeLightRequest) throws Exception {
         //验证管理员或用户的身份

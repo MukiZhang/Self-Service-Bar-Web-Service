@@ -150,4 +150,32 @@ public class SeatService {
 
         return seat;
     }
+
+    public boolean changeAllSeatState(String token, SeatStateEnum modeEnum) throws Exception {
+        //验证管理员或用户的身份
+        administratorService.getAdministratorIdFromToken(token);
+        List<Seat> seats = seatMapper.getAllSeats();
+
+        for (Seat seat : seats) {
+            //更改灯的状态
+            switch (modeEnum) {
+                case close: {
+                    hardwareStateMapper.closeByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue());
+                    break;
+                }
+                case open: {
+                    hardwareStateMapper.openByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue());
+                    break;
+                }
+            }
+        }
+        HardwareLog hardwareLog;
+        if (modeEnum == SeatStateEnum.close)
+            hardwareLog = new HardwareLog("99999", HardwareTypeEnum.seat.getValue(), "admin", HardwareStateEnum.close.getValue(), "");
+        else
+            hardwareLog = new HardwareLog("99999", HardwareTypeEnum.seat.getValue(), "admin", HardwareStateEnum.open.getValue(), "");
+        hardwareLogMapper.createNewLog(hardwareLog);
+
+        return true;
+    }
 }
