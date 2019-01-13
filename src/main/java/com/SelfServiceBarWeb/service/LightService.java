@@ -1,5 +1,6 @@
 package com.SelfServiceBarWeb.service;
 
+import com.SelfServiceBarWeb.DeviceController.Devices.LightHardware;
 import com.SelfServiceBarWeb.constant.ResponseMessage;
 import com.SelfServiceBarWeb.mapper.*;
 import com.SelfServiceBarWeb.model.*;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -65,10 +67,19 @@ public class LightService {
             throw new SelfServiceBarWebException(404, ResponseMessage.ERROR, ResponseMessage.LIGHT_NOT_NOT_FOUND);
 
         Hardware lightState = hardwareStateMapper.getByIdAndType(light.getId(), HardwareTypeEnum.light.getValue());
-        light.setState(HardwareStateEnum.getHardwareStateEnum(lightState.getState()));
-        light.setHardwareLogs(hardwareLogMapper.getRecentByIdAndType(light.getId(), HardwareTypeEnum.light.getValue()));
-        light.setLuminance(lightState.getLuminance());
-        light.setColor_temperature(lightState.getColor_temperature());
+        //没有对应的硬件
+        if (lightState.getAvailability() == 0) {
+            light.setState(HardwareStateEnum.getHardwareStateEnum(lightState.getState()));
+            light.setHardwareLogs(hardwareLogMapper.getRecentByIdAndType(light.getId(), HardwareTypeEnum.light.getValue()));
+            light.setLuminance(lightState.getLuminance());
+            light.setColor_temperature(lightState.getColor_temperature());
+        }
+        //有对应的硬件
+        else {
+            LightHardware lightHardware = new LightHardware();
+            //{ColorTemperature=3400, Luminance=80, Switch=1, State=111, DeviceId=000B57FFFEDEEFBD, SofterVersion=20180427}
+            Map<String, String> lightHardwareState = lightHardware.getRecentState(Integer.valueOf(light.getHardware_id()), HardwareTypeEnum.light.toString());
+        }
         return light;
     }
 

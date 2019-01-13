@@ -13,8 +13,8 @@ import java.util.*;
 public class OrdinaryDe extends Thread {
     States state;
 
-    private String ip_id_t_file = "../first/src/Files/ip_id_type.txt";
-    private String response_file = "../first/src/Files/response.txt";
+    private String ip_id_t_file = "../Self-Service-Bar-Web-Service/src/main/java/com/SelfServiceBarWeb/DeviceController/Files/ip_id_type.txt";
+    private String response_file = "../Self-Service-Bar-Web-Service/src/main/java/com/SelfServiceBarWeb/DeviceController/Files/response.txt";
     private static int Error;
 
     static {

@@ -17,10 +17,11 @@ import java.util.regex.Pattern;
 /**
  * Title: Response.java
  * Description: this class is object of the gateway it contain the information of the Respounce.txt.
+ *
  * @author Jie Ji
  * @version 1.0
  */
-public class Light extends BasicFunction implements Device {
+public class LightHardware extends BasicFunction implements Device {
     static private String TYPE = "light";
     String userName = "904197538@qq.com";   //用户邮箱地址
     String password = "oxojtiunubzfbegi";    //者授权码
@@ -52,6 +53,7 @@ public class Light extends BasicFunction implements Device {
         }
         return resu;
     }
+
     @Override
     public ArrayList<String> AddNewD() {
         int deNo = 10001;
@@ -81,6 +83,7 @@ public class Light extends BasicFunction implements Device {
         }
         return newLs;
     }
+
     @Override
     public ArrayList<Map<String, String>> searchD(ArrayList<String> infos) {
 
@@ -147,11 +150,13 @@ public class Light extends BasicFunction implements Device {
         }
         return newIDs;
     }
+
     @Override
     public boolean delateD(String ids) {
         Delete(ids, 1, "light");
         return true;
     }
+
     @Override
     public boolean openD(String ids) {
         int result;
@@ -216,6 +221,7 @@ public class Light extends BasicFunction implements Device {
         }
 
     }
+
     @Override
     public boolean closeD(String ids) {
         int type = 2;
@@ -280,7 +286,6 @@ public class Light extends BasicFunction implements Device {
     }
 
     /**
-     *
      * @param ids
      * @param value
      * @return
@@ -354,7 +359,6 @@ public class Light extends BasicFunction implements Device {
     }
 
     /**
-     *
      * @param ids
      * @param value
      * @return
@@ -425,6 +429,7 @@ public class Light extends BasicFunction implements Device {
         }
 
     }
+
     @Override
     public Map delateDs(ArrayList<String> ids) {
         Map<String, Boolean> results = new HashMap<>();
@@ -434,6 +439,7 @@ public class Light extends BasicFunction implements Device {
         }
         return results;
     }
+
     @Override
     public Map openDs(ArrayList<String> ids) {
         Map<String, Boolean> results = new HashMap<>();
@@ -443,6 +449,7 @@ public class Light extends BasicFunction implements Device {
         }
         return results;
     }
+
     @Override
     public Map closeDs(ArrayList<String> ids) {
         Map<String, Boolean> results = new HashMap<>();
@@ -454,7 +461,6 @@ public class Light extends BasicFunction implements Device {
     }
 
     /**
-     *
      * @param id_values
      * @return
      */
@@ -470,7 +476,6 @@ public class Light extends BasicFunction implements Device {
     }
 
     /**
-     *
      * @param id_values
      * @return
      */
@@ -483,13 +488,14 @@ public class Light extends BasicFunction implements Device {
         }
         return results;
     }
+
     @Override
     public Map<String, String> getRecentState(int id, String type) {
         Map<String, String> State = new HashMap<>();
         String sta = "";
-        ArrayList<Response> respounces = StrToResp(readFiles(response_file));
+        ArrayList<Response> responses = StrToResp(readFiles(response_file));
         String infos = "";
-        for (Response res : respounces) {
+        for (Response res : responses) {
             if (res.getDeviceNo() == id && res.getType().contains(type) && res.getReType() == 1) {
                 infos = res.getRespounceInfo();
                 sta = String.valueOf(res.getResult());
@@ -513,7 +519,6 @@ public class Light extends BasicFunction implements Device {
                 State.put(str[0], str[1]);
             }
         }
-
         return State;
     }
 

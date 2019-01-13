@@ -4,7 +4,7 @@ import com.SelfServiceBarWeb.DeviceController.Message_.State.Refresh;
 
 public class Init {
     public Init() throws Exception {
-        Light l = new Light();
+        LightHardware l = new LightHardware();
         new Refresh();
         l.init();
     }

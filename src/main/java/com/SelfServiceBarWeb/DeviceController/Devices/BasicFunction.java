@@ -244,6 +244,7 @@ public class BasicFunction {
                 mimeDTO.setText("Please check the attachment.\n请查收附件。");
                 ArrayList<String> filepath = new ArrayList<>();
                 filepath.add(mail.info);
+                //todo
                 filepath.add("/home/jijie/IdeaProjects/first/src/Files/ip_id_type.txt");
                 if (MailUtil.sendEmailByFile(mail.senderAdd, mail.passWord, mail.receiverAdd, mimeDTO, filepath)) {
                     System.out.println("邮件发送成功！");
