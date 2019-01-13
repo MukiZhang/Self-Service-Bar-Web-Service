@@ -5,7 +5,8 @@ package com.SelfServiceBarWeb.model.request;
  */
 public enum TokenTypeEnum {
     administrator(1),
-    user(2);
+    user(2),
+    pad(3);
     private int value;
 
     TokenTypeEnum(int value) {

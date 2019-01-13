@@ -1,0 +1,1 @@
+G001 192.168.0.101 7000 Light {Ver=1.1.0,-CooVer=-Sep--8-2018,-Command=Response,-Port=7000,-Ip=192.168.0.101,-Model=IHA1211HB,-Data=[],-Code=98999308,-Mac=000D6F000FFDBAE4}

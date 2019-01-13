@@ -3,6 +3,7 @@ package com.SelfServiceBarWeb.controller;
 import com.SelfServiceBarWeb.model.PowerSource;
 import com.SelfServiceBarWeb.model.request.ChangePowerSourceRequest;
 import com.SelfServiceBarWeb.model.request.CreatePowerSourceRequest;
+import com.SelfServiceBarWeb.model.request.PowerSourceStateEnum;
 import com.SelfServiceBarWeb.service.PowerSourceService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -42,5 +43,12 @@ public class PowerSourceController {
     @RequestMapping(path = "/{powerSourceId}", method = RequestMethod.PATCH)
     public PowerSource changePowerSourceState(@PathVariable(value = "powerSourceId") String powerSourceId, @RequestBody ChangePowerSourceRequest changePowerSourceRequest) throws Exception {
         return powerSourceService.changePowerSourceState(powerSourceId, changePowerSourceRequest);
+    }
+
+    //该请求是管理员调用
+    @ApiOperation(value = "更改所有电源的状态")
+    @RequestMapping(path = "/all", method = RequestMethod.PATCH)
+    public boolean changePowerSourceState(@RequestParam(value = "token") String token, @RequestParam(value = "mode") PowerSourceStateEnum powerSourceStateEnum) throws Exception {
+        return powerSourceService.changeAllPowerSourceState(token, powerSourceStateEnum);
     }
 }

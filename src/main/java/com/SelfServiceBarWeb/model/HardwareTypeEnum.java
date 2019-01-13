@@ -8,7 +8,8 @@ public enum HardwareTypeEnum {
     seat(2),
     light(3),
     monitor(4),
-    power_source(5);
+    power_source(5),
+    pad(6);
     private int value;
 
     HardwareTypeEnum(int value) {

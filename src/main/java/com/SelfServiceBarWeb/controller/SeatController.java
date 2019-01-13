@@ -4,6 +4,7 @@ package com.SelfServiceBarWeb.controller;
 import com.SelfServiceBarWeb.model.Seat;
 import com.SelfServiceBarWeb.model.request.ChangeSeatRequest;
 import com.SelfServiceBarWeb.model.request.CreateSeatRequest;
+import com.SelfServiceBarWeb.model.request.SeatStateEnum;
 import com.SelfServiceBarWeb.model.request.TokenTypeEnum;
 import com.SelfServiceBarWeb.service.SeatService;
 import io.swagger.annotations.Api;
@@ -55,6 +56,13 @@ public class SeatController {
     @RequestMapping(path = "/{seatId}", method = RequestMethod.PATCH)
     public Seat changeSeatState(@PathVariable(value = "seatId") String seatId, @RequestBody ChangeSeatRequest changeSeatRequest) throws Exception {
         return seatService.changeSeatState(seatId, changeSeatRequest);
+    }
+
+    //该请求是管理员调用
+    @ApiOperation(value = "更改座位的状态")
+    @RequestMapping(path = "/all", method = RequestMethod.PATCH)
+    public boolean changeAllSeatState(@RequestParam(value = "token") String token, @RequestParam(value = "mode") SeatStateEnum seatStateEnum) throws Exception {
+        return seatService.changeAllSeatState(token, seatStateEnum);
     }
 
     //由用户调用

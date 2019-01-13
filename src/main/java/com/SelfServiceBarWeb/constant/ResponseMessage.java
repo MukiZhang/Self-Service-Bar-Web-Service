@@ -5,6 +5,7 @@ package com.SelfServiceBarWeb.constant;
  */
 public class ResponseMessage {
     public static final String ERROR = "error!";
+    public static final String ADMINISTER = "administer";
     public static final String MEDIA_TYPE_NOT_MATCH = "类型不匹配";
     public static final String MEDIA_TYPE_NOT_SUPPORT = "请求参数类型不支持";
     public static final String CAN_NOT_FIND_FILE = "找不到该文件";
@@ -34,6 +35,7 @@ public class ResponseMessage {
     public static final String ERROR_ENTER_TIME = "进门时间不在预定时间内";
     public static final String INVALID_CONTROL_TOKEN = "无效的设备控制token，验证失败";
     public static final String LIGHT_NOT_NOT_FOUND = "找不到灯信息";
+    public static final String PAD_NOT_NOT_FOUND = "找不到pad信息";
     public static final String PLEASE_CLEAN = "请清理桌面";
     public static final String ERROR_LEAVE_TIME = "您已超时";
 }

@@ -105,5 +105,14 @@
             <version>2.6.1</version>
         </dependency>
 
+        <dependency>
+            <groupId>cn.yuhi</groupId>
+            <artifactId>easymail</artifactId>
+            <version>1.0.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/lib/easymail.jar</systemPath>
+        </dependency>
+
+
     </dependencies>
 </project>

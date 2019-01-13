@@ -56,7 +56,6 @@ public class AdministratorService {
             administrator.setToken_create_at(null);
             return administrator;
         }
-
     }
 
     public void logout(String token) throws Exception {
@@ -68,6 +67,7 @@ public class AdministratorService {
         getAdministratorIdFromToken(token);
         List<List<Integer>> res = new ArrayList<>();
         int[][] layoutArray = new int[row][column];
+        HashMap<String, String> seatIds = new HashMap<>();
 
         List<Seat> seatPosition = seatMapper.getAllSeatPosition();
         for (Seat seat : seatPosition) {
@@ -76,6 +76,7 @@ public class AdministratorService {
             if (x >= row || y >= column)
                 continue;
             layoutArray[x][y] = 1;
+            seatIds.put(x + "+" + y, seat.getId());
         }
 
         List<Table> tablePosition = tableMapper.getAll();
@@ -95,6 +96,7 @@ public class AdministratorService {
             res.add(listSub);
         }
         HashMap<String, Object> resMap = new HashMap<>();
+        resMap.put("seatIds", seatIds);
         resMap.put("layout", res);
         resMap.put("row", row);
         resMap.put("column", column);

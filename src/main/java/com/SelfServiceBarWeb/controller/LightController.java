@@ -3,6 +3,7 @@ package com.SelfServiceBarWeb.controller;
 
 import com.SelfServiceBarWeb.model.Light;
 import com.SelfServiceBarWeb.model.request.ChangeLightRequest;
+import com.SelfServiceBarWeb.model.request.ChangeLightStateModeEnum;
 import com.SelfServiceBarWeb.model.request.CreateLightRequest;
 import com.SelfServiceBarWeb.model.request.TokenTypeEnum;
 import com.SelfServiceBarWeb.service.LightService;
@@ -31,7 +32,7 @@ public class LightController {
     }
 
     //该请求可能是用户调用  或者是管理员调用
-    @ApiOperation(value = "获取指定id的灯光信息(管理员)")
+    @ApiOperation(value = "获取指定id的灯光信息(管理员、pad, pad的灯光id在token里面)")
     @RequestMapping(path = "/{lightId}", method = RequestMethod.GET)
     public Light getLightInfo(@PathVariable(value = "lightId") String lightId, @RequestParam(value = "token") String token, @RequestParam(value = "tokenType") TokenTypeEnum tokenTypeEnum) throws Exception {
         return lightService.getLightInfo(lightId, token, tokenTypeEnum);
@@ -52,10 +53,16 @@ public class LightController {
 
     //todo  暂时不知道灯的控制方式，在更改状态时需要传递的参数
     //该请求可能是用户调用  或者是管理员调用
-    @ApiOperation(value = "更改灯的状态(用户、管理员)")
+    @ApiOperation(value = "更改灯的状态(用户、管理员、pad)")
     @RequestMapping(path = "/{lightId}", method = RequestMethod.PATCH)
     public Light changeLightState(@PathVariable(value = "lightId") String lightId, @RequestBody ChangeLightRequest changeLightRequest) throws Exception {
         return lightService.changeLightState(lightId, changeLightRequest);
+    }
+
+    @ApiOperation(value = "更改所有灯的状态(用户、管理员、pad)")
+    @RequestMapping(path = "/all", method = RequestMethod.PATCH)
+    public boolean changeAllLightState(@RequestParam(value = "token") String token, @RequestParam(value = "mode") ChangeLightStateModeEnum changeLightStateModeEnum) throws Exception {
+        return lightService.changeAllLightState(token, changeLightStateModeEnum);
     }
 
     @ApiOperation(value = "获取指定订单编号对应的灯光信息(用户)")
