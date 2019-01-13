@@ -3,6 +3,7 @@ package com.SelfServiceBarWeb.controller;
 import com.SelfServiceBarWeb.model.Monitor;
 import com.SelfServiceBarWeb.model.request.ChangeMonitorRequest;
 import com.SelfServiceBarWeb.model.request.CreateMonitorRequest;
+import com.SelfServiceBarWeb.model.request.MonitorStateEnum;
 import com.SelfServiceBarWeb.model.request.TokenTypeEnum;
 import com.SelfServiceBarWeb.service.MonitorService;
 import io.swagger.annotations.Api;
@@ -53,5 +54,11 @@ public class MonitorController {
     @RequestMapping(path = "/{monitorId}", method = RequestMethod.PATCH)
     public Monitor changeMonitorState(@PathVariable(value = "monitorId") String monitorId, @RequestBody ChangeMonitorRequest changeMonitorRequest) throws Exception {
         return monitorService.changeMonitorState(monitorId, changeMonitorRequest);
+    }
+
+    @ApiOperation(value = "更改所有监控的状态")
+    @RequestMapping(path = "/all", method = RequestMethod.PATCH)
+    public boolean changeAllMonitorState(@RequestParam(value = "token") String token, @RequestParam(value = "mode") MonitorStateEnum monitorStateEnum) throws Exception {
+        return monitorService.changeAllMonitorState(token, monitorStateEnum);
     }
 }

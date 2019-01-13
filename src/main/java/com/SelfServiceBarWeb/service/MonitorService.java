@@ -122,4 +122,31 @@ public class MonitorService {
 
         return monitor;
     }
+
+    public boolean changeAllMonitorState(String token, MonitorStateEnum monitorStateEnum) throws Exception {
+        administratorService.getAdministratorIdFromToken(token);
+
+        List<Monitor> monitors = monitorMapper.getAll();
+
+        for (Monitor monitor : monitors) {
+            //更改灯的状态
+            switch (monitorStateEnum) {
+                case close: {
+                    hardwareStateMapper.closeByIdAndType(monitor.getId(), HardwareTypeEnum.monitor.getValue());
+                    break;
+                }
+                case open: {
+                    hardwareStateMapper.openByIdAndType(monitor.getId(), HardwareTypeEnum.monitor.getValue());
+                    break;
+                }
+            }
+        }
+        HardwareLog hardwareLog;
+        if (monitorStateEnum == MonitorStateEnum.close)
+            hardwareLog = new HardwareLog("99999", HardwareTypeEnum.monitor.getValue(), "admin", HardwareStateEnum.close.getValue(), "");
+        else
+            hardwareLog = new HardwareLog("99999", HardwareTypeEnum.monitor.getValue(), "admin", HardwareStateEnum.open.getValue(), "");
+        hardwareLogMapper.createNewLog(hardwareLog);
+        return true;
+    }
 }

@@ -171,6 +171,27 @@ public class EntranceService {
         return entrance;
     }
 
+    public boolean changeAllEntranceState(String token, EntranceStateEnum entranceStateEnum) throws Exception {
+        Entrance entrance = entranceMapper.getEntranceInfo(entranceId);
+        administratorService.getAdministratorIdFromToken(token);
+        HardwareLog hardwareLog;
+        switch (entranceStateEnum) {
+            case open: {
+                hardwareStateMapper.openByIdAndType(entrance.getId(), HardwareTypeEnum.entrance.getValue());
+                hardwareLog = new HardwareLog("99999", HardwareTypeEnum.entrance.getValue(), ResponseMessage.ADMINISTER, HardwareStateEnum.open.getValue(), "");
+                hardwareLogMapper.createNewLog(hardwareLog);
+                break;
+            }
+            case close: {
+                hardwareStateMapper.closeByIdAndType(entrance.getId(), HardwareTypeEnum.entrance.getValue());
+                hardwareLog = new HardwareLog("99999", HardwareTypeEnum.entrance.getValue(), ResponseMessage.ADMINISTER, HardwareStateEnum.close.getValue(), "");
+                hardwareLogMapper.createNewLog(hardwareLog);
+                break;
+            }
+        }
+        return true;
+    }
+
     //在生成出门二维码时检查是否干净、向app后台结束订单、结束本地订单状态、设备状态更改
     public QRCodeContentResponse genLeaveQRContent(String token) throws Exception {
         SimpleDateFormat scheduledDaySdf = new SimpleDateFormat(scheduledDaySdfPatternString);

@@ -56,7 +56,6 @@ public class AdministratorService {
             administrator.setToken_create_at(null);
             return administrator;
         }
-
     }
 
     public void logout(String token) throws Exception {
