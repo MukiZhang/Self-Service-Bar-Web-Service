@@ -23,6 +23,7 @@ public class ResponseMessage {
     public static final String CREATE_SEAT_ERROR = "创建座位时发生错误";
 
     public static final String GET_MONITOR_INFO_ERROR = "修改监控状态时发生错误";
+    public static final String SET_LIGHT_INFO_ERROR = "修改灯状态时发生错误";
 
     public static final String GET_POWER_SOURCE_INFO_ERROR = "修改电源状态时发生错误";
 

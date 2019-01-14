@@ -67,10 +67,14 @@ public class LightService {
             throw new SelfServiceBarWebException(404, ResponseMessage.ERROR, ResponseMessage.LIGHT_NOT_NOT_FOUND);
 
         Hardware lightState = hardwareStateMapper.getByIdAndType(light.getId(), HardwareTypeEnum.light.getValue());
+        perfectLightInfo(light, lightState);
+        return light;
+    }
+
+    private void perfectLightInfo(Light light, Hardware lightState) {
         //没有对应的硬件
         if (lightState.getAvailability() == 0) {
             light.setState(HardwareStateEnum.getHardwareStateEnum(lightState.getState()));
-            light.setHardwareLogs(hardwareLogMapper.getRecentByIdAndType(light.getId(), HardwareTypeEnum.light.getValue()));
             light.setLuminance(lightState.getLuminance());
             light.setColor_temperature(lightState.getColor_temperature());
         }
@@ -79,8 +83,11 @@ public class LightService {
             LightHardware lightHardware = new LightHardware();
             //{ColorTemperature=3400, Luminance=80, Switch=1, State=111, DeviceId=000B57FFFEDEEFBD, SofterVersion=20180427}
             Map<String, String> lightHardwareState = lightHardware.getRecentState(Integer.valueOf(light.getHardware_id()), HardwareTypeEnum.light.toString());
+            light.setState(HardwareStateEnum.getHardwareStateEnum(Integer.valueOf(lightHardwareState.get("Switch"))));
+            light.setLuminance(Integer.valueOf(lightHardwareState.get("Luminance")));
+            light.setColor_temperature(Integer.valueOf(lightHardwareState.get("ColorTemperature")));
         }
-        return light;
+        light.setHardwareLogs(hardwareLogMapper.getRecentByIdAndType(light.getId(), HardwareTypeEnum.light.getValue()));
     }
 
     public List<Light> getAllLightInfo(String token) throws Exception {
@@ -88,10 +95,7 @@ public class LightService {
         List<Light> lights = lightMapper.getAll();
         for (Light light : lights) {
             Hardware lightState = hardwareStateMapper.getByIdAndType(light.getId(), HardwareTypeEnum.light.getValue());
-            light.setState(HardwareStateEnum.getHardwareStateEnum(lightState.getState()));
-            light.setHardwareLogs(hardwareLogMapper.getRecentByIdAndType(light.getId(), HardwareTypeEnum.light.getValue()));
-            light.setLuminance(lightState.getLuminance());
-            light.setColor_temperature(lightState.getColor_temperature());
+            perfectLightInfo(light, lightState);
         }
         return lights;
     }
@@ -168,6 +172,7 @@ public class LightService {
         Light light = lightMapper.getById(lightId);
 
         HardwareLog hardwareLog;
+        Hardware lightState;
         String identity = "";
 
         switch (changeLightRequest.getTokenTypeEnum()) {
@@ -196,20 +201,15 @@ public class LightService {
         if (light == null)
             throw new SelfServiceBarWebException(404, ResponseMessage.ERROR, ResponseMessage.LIGHT_NOT_NOT_FOUND);
 
+        Integer hardwareAvailability = hardwareStateMapper.getAvailabilityByIdAndType(light.getId(), HardwareTypeEnum.light.getValue());
         //更改灯的状态
         switch (changeLightRequest.getMode()) {
             case close: {
-                hardwareStateMapper.closeByIdAndType(light.getId(), HardwareTypeEnum.light.getValue());
-
-                hardwareLog = new HardwareLog(light.getId(), HardwareTypeEnum.light.getValue(), identity, HardwareStateEnum.close.getValue(), "");
-                hardwareLogMapper.createNewLog(hardwareLog);
+                closeLight(light, hardwareAvailability, identity);
                 break;
             }
             case open: {
-                hardwareStateMapper.openByIdAndType(light.getId(), HardwareTypeEnum.light.getValue());
-
-                hardwareLog = new HardwareLog(light.getId(), HardwareTypeEnum.light.getValue(), identity, HardwareStateEnum.open.getValue(), "");
-                hardwareLogMapper.createNewLog(hardwareLog);
+                openLight(light, hardwareAvailability, identity);
                 break;
             }
             /*case luminanceOffset: {
@@ -222,32 +222,78 @@ public class LightService {
                 break;
             }*/
             case setLuminance: {
-                if (changeLightRequest.getLuminanceValue() < 0 || changeLightRequest.getLuminanceValue() > 100)
-                    throw new SelfServiceBarWebException(400, ResponseMessage.ERROR, ResponseMessage.ERROR_PARAM);
-                hardwareStateMapper.setLuminanceByIdAndType(changeLightRequest.getLuminanceValue(), light.getId(), HardwareTypeEnum.light.getValue());
-
-                hardwareLog = new HardwareLog(light.getId(), HardwareTypeEnum.light.getValue(), identity, HardwareStateEnum.change_luminance.getValue(), "" + changeLightRequest.getLuminanceValue());
-                hardwareLogMapper.createNewLog(hardwareLog);
+                setLuminance(light, hardwareAvailability, identity, changeLightRequest.getLuminanceValue());
                 break;
             }
             case setColorTemperature: {
-                if (changeLightRequest.getColor_temperature() < 2700 || changeLightRequest.getColor_temperature() > 6500)
-                    throw new SelfServiceBarWebException(400, ResponseMessage.ERROR, ResponseMessage.ERROR_PARAM);
-                hardwareStateMapper.setColorTemperatureByIdAndType(changeLightRequest.getColor_temperature(), light.getId(), HardwareTypeEnum.light.getValue());
-
-                hardwareLog = new HardwareLog(light.getId(), HardwareTypeEnum.light.getValue(), identity, HardwareStateEnum.change_color_temperature.getValue(), "" + changeLightRequest.getColor_temperature());
-                hardwareLogMapper.createNewLog(hardwareLog);
+                setColorTemperature(light, hardwareAvailability, identity, changeLightRequest.getColor_temperature());
                 break;
             }
         }
 
-        Hardware lightState = hardwareStateMapper.getByIdAndType(light.getId(), HardwareTypeEnum.light.getValue());
-        light.setState(HardwareStateEnum.getHardwareStateEnum(lightState.getState()));
-        light.setLuminance(lightState.getLuminance());
-        light.setColor_temperature(lightState.getColor_temperature());
-
-        light.setHardwareLogs(hardwareLogMapper.getRecentByIdAndType(light.getId(), HardwareTypeEnum.light.getValue()));
+        lightState = hardwareStateMapper.getByIdAndType(light.getId(), HardwareTypeEnum.light.getValue());
+        perfectLightInfo(light, lightState);
         return light;
+    }
+
+    private void closeLight(Light light, Integer hardwareAvailability, String identity) {
+        //没有对应的硬件
+        if (hardwareAvailability == 0)
+            hardwareStateMapper.closeByIdAndType(light.getId(), HardwareTypeEnum.light.getValue());
+            //有对应的硬件
+        else if (hardwareAvailability == 1) {
+            LightHardware lightHardware = new LightHardware();
+            if (!lightHardware.closeD(light.getHardware_id()))
+                throw new SelfServiceBarWebException(500, ResponseMessage.ERROR, ResponseMessage.SET_LIGHT_INFO_ERROR);
+        }
+        HardwareLog hardwareLog = new HardwareLog(light.getId(), HardwareTypeEnum.light.getValue(), identity, HardwareStateEnum.close.getValue(), "");
+        hardwareLogMapper.createNewLog(hardwareLog);
+    }
+
+    private void openLight(Light light, Integer hardwareAvailability, String identity) {
+        //没有对应的硬件
+        if (hardwareAvailability == 0)
+            hardwareStateMapper.openByIdAndType(light.getId(), HardwareTypeEnum.light.getValue());
+            //有对应的硬件
+        else if (hardwareAvailability == 1) {
+            LightHardware lightHardware = new LightHardware();
+            if (!lightHardware.openD(light.getHardware_id()))
+                throw new SelfServiceBarWebException(500, ResponseMessage.ERROR, ResponseMessage.SET_LIGHT_INFO_ERROR);
+        }
+        HardwareLog hardwareLog = new HardwareLog(light.getId(), HardwareTypeEnum.light.getValue(), identity, HardwareStateEnum.close.getValue(), "");
+        hardwareLogMapper.createNewLog(hardwareLog);
+    }
+
+    private void setLuminance(Light light, Integer hardwareAvailability, String identity, Integer luminance) {
+        if (luminance < 0 || luminance > 100)
+            throw new SelfServiceBarWebException(400, ResponseMessage.ERROR, ResponseMessage.ERROR_PARAM);
+        //没有对应的硬件
+        if (hardwareAvailability == 0)
+            hardwareStateMapper.setLuminanceByIdAndType(luminance, light.getId(), HardwareTypeEnum.light.getValue());
+            //有对应的硬件
+        else if (hardwareAvailability == 1) {
+            LightHardware lightHardware = new LightHardware();
+            if (!lightHardware.controlLum(light.getHardware_id(), luminance))
+                throw new SelfServiceBarWebException(500, ResponseMessage.ERROR, ResponseMessage.SET_LIGHT_INFO_ERROR);
+        }
+        HardwareLog hardwareLog = new HardwareLog(light.getId(), HardwareTypeEnum.light.getValue(), identity, HardwareStateEnum.change_luminance.getValue(), "" + luminance);
+        hardwareLogMapper.createNewLog(hardwareLog);
+    }
+
+    private void setColorTemperature(Light light, Integer hardwareAvailability, String identity, Integer colorTemperature) {
+        if (colorTemperature < 2700 || colorTemperature > 6500)
+            throw new SelfServiceBarWebException(400, ResponseMessage.ERROR, ResponseMessage.ERROR_PARAM);
+        //没有对应的硬件
+        if (hardwareAvailability == 0)
+            hardwareStateMapper.setColorTemperatureByIdAndType(colorTemperature, light.getId(), HardwareTypeEnum.light.getValue());
+            //有对应的硬件
+        else if (hardwareAvailability == 1) {
+            LightHardware lightHardware = new LightHardware();
+            if (!lightHardware.controlTemp(light.getHardware_id(), colorTemperature))
+                throw new SelfServiceBarWebException(500, ResponseMessage.ERROR, ResponseMessage.SET_LIGHT_INFO_ERROR);
+        }
+        HardwareLog hardwareLog = new HardwareLog(light.getId(), HardwareTypeEnum.light.getValue(), identity, HardwareStateEnum.change_color_temperature.getValue(), "" + colorTemperature);
+        hardwareLogMapper.createNewLog(hardwareLog);
     }
 
     public List<Light> getLightInfoByOrderNo(String token) throws Exception {
@@ -269,10 +315,7 @@ public class LightService {
         for (String seatId : seatIds) {
             Light light = lightMapper.getLightBySeatId(seatId);
             Hardware lightState = hardwareStateMapper.getByIdAndType(light.getId(), HardwareTypeEnum.light.getValue());
-            light.setState(HardwareStateEnum.getHardwareStateEnum(lightState.getState()));
-            light.setLuminance(lightState.getLuminance());
-            light.setColor_temperature(lightState.getColor_temperature());
-            light.setHardwareLogs(hardwareLogMapper.getRecentByIdAndType(light.getId(), HardwareTypeEnum.light.getValue()));
+            perfectLightInfo(light, lightState);
             lights.add(light);
         }
 
