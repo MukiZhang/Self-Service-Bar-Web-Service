@@ -38,4 +38,10 @@ public class OrderController {
 
         orderService.createOrder(order);
     }
+
+    @ApiOperation(value = "订单续时")
+    @RequestMapping(path = "/{orderNo}", method = RequestMethod.PATCH)
+    public void renewOrder(@PathVariable(value = "orderNo") String orderNo, @RequestParam Integer renewedEndHour) throws Exception {
+
+    }
 }

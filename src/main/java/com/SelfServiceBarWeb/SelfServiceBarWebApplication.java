@@ -1,5 +1,6 @@
 package com.SelfServiceBarWeb;
 
+import com.SelfServiceBarWeb.server.SocketServer;
 import org.mybatis.spring.annotation.MapperScan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,5 +24,9 @@ public class SelfServiceBarWebApplication {
         Logger logger = LoggerFactory.getLogger(SelfServiceBarWebApplication.class);
         logger.debug("start application");
         SpringApplication.run(SelfServiceBarWebApplication.class, args);
+
+        //启动socket服务
+        SocketServer server = new SocketServer();
+        server.startSocketServer(8188);
     }
 }

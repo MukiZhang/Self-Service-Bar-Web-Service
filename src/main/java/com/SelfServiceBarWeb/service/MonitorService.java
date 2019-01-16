@@ -88,7 +88,7 @@ public class MonitorService {
         monitor.setState(HardwareStateEnum.close);
 
         //加入日志
-        HardwareLog hardwareLog = new HardwareLog(monitor.getId(), HardwareTypeEnum.monitor.getValue(), "administer", HardwareStateEnum.create.getValue(), "");
+        HardwareLog hardwareLog = new HardwareLog(monitor.getId(), HardwareTypeEnum.monitor.getValue(), ResponseMessage.ADMINISTER, HardwareStateEnum.create.getValue(), "");
         hardwareLogMapper.createNewLog(hardwareLog);
 
         monitor.setHardwareLogs(hardwareLogMapper.getRecentByIdAndType(monitor.getId(), HardwareTypeEnum.monitor.getValue()));
@@ -108,18 +108,45 @@ public class MonitorService {
             case open:
                 hardwareStateMapper.openByIdAndType(monitor.getId(), HardwareTypeEnum.monitor.getValue());
                 //加入日志
-                hardwareLog = new HardwareLog(monitor.getId(), HardwareTypeEnum.monitor.getValue(), "administer", HardwareStateEnum.open.getValue(), "");
+                hardwareLog = new HardwareLog(monitor.getId(), HardwareTypeEnum.monitor.getValue(), ResponseMessage.ADMINISTER, HardwareStateEnum.open.getValue(), "");
                 hardwareLogMapper.createNewLog(hardwareLog);
                 break;
             case close:
                 hardwareStateMapper.closeByIdAndType(monitor.getId(), HardwareTypeEnum.monitor.getValue());
                 //加入日志
-                hardwareLog = new HardwareLog(monitor.getId(), HardwareTypeEnum.monitor.getValue(), "administer", HardwareStateEnum.close.getValue(), "");
+                hardwareLog = new HardwareLog(monitor.getId(), HardwareTypeEnum.monitor.getValue(), ResponseMessage.ADMINISTER, HardwareStateEnum.close.getValue(), "");
                 hardwareLogMapper.createNewLog(hardwareLog);
                 break;
         }
         monitor.setHardwareLogs(hardwareLogMapper.getRecentByIdAndType(monitor.getId(), HardwareTypeEnum.monitor.getValue()));
 
         return monitor;
+    }
+
+    public boolean changeAllMonitorState(String token, MonitorStateEnum monitorStateEnum) throws Exception {
+        administratorService.getAdministratorIdFromToken(token);
+
+        List<Monitor> monitors = monitorMapper.getAll();
+
+        for (Monitor monitor : monitors) {
+            //更改灯的状态
+            switch (monitorStateEnum) {
+                case close: {
+                    hardwareStateMapper.closeByIdAndType(monitor.getId(), HardwareTypeEnum.monitor.getValue());
+                    break;
+                }
+                case open: {
+                    hardwareStateMapper.openByIdAndType(monitor.getId(), HardwareTypeEnum.monitor.getValue());
+                    break;
+                }
+            }
+        }
+        HardwareLog hardwareLog;
+        if (monitorStateEnum == MonitorStateEnum.close)
+            hardwareLog = new HardwareLog("99999", HardwareTypeEnum.monitor.getValue(), "admin", HardwareStateEnum.close.getValue(), "");
+        else
+            hardwareLog = new HardwareLog("99999", HardwareTypeEnum.monitor.getValue(), "admin", HardwareStateEnum.open.getValue(), "");
+        hardwareLogMapper.createNewLog(hardwareLog);
+        return true;
     }
 }
