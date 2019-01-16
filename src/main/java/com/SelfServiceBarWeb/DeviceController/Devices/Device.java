@@ -74,4 +74,6 @@ public interface Device {
      */
     Map<String, String> getRecentState(int id, String type);
 
+    String testConnection(String ip, int port);
+
 }

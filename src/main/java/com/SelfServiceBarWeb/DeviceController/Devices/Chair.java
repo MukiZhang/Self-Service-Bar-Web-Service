@@ -1,5 +1,7 @@
 package com.SelfServiceBarWeb.DeviceController.Devices;
 
+import com.SelfServiceBarWeb.DeviceController.Message_.Clinet;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -99,5 +101,11 @@ public class Chair extends BasicFunction implements Device {
         Map<String, String> State = new HashMap<>();
 
         return State;
+    }
+
+    @Override
+    public String testConnection(String ip, int port) {
+        byte[] message = {0x01, 0x01};
+        return new Clinet().unicastToChair(ip, port, message);
     }
 }

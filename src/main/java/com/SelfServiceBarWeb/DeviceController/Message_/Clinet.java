@@ -66,6 +66,7 @@ public class Clinet {
         return reply;
     }
 
+    //单播
     public String unicast(String ip, int port, String message) {
         InputStream in = null;
         OutputStream out = null;
@@ -149,5 +150,78 @@ public class Clinet {
             newM.append("}").append(a[i]);
         }
         return newM.toString();
+    }
+
+    public String unicastToChair(String ip, int port, byte[] message) {
+        InputStream in = null;
+        OutputStream out = null;
+        Socket socket = null;
+        String result;
+        result = null;
+        int con = 0;
+        try {
+            socket = new Socket(ip, port);
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            con++;
+//            e.printStackTrace();
+        } finally {
+            if (con == 0) {
+                try {
+                    out = socket.getOutputStream();
+                    socket.setSoTimeout(1000 * 2);
+                    byte[] responseHeaderBuf = TypeUtil.int2Bytes(message.length + 2);
+                    byte[] buf = message;
+                    byte[] responseBodyBuf = new byte[message.length + 2];
+                    int count = 2;
+                    //序号
+                    responseBodyBuf[0] = 0x00;
+                    responseBodyBuf[1] = 0x01;
+                    for (byte b : buf)
+                        responseBodyBuf[count++] = b;
+
+                    out.write(responseHeaderBuf);
+                    out.write(responseBodyBuf);
+                    out.flush();
+                    in = socket.getInputStream(); // 读头信息，即Body长度
+                    byte[] headerBuf = new byte[4];
+                    in.read(headerBuf);
+                    int bodyLength = TypeUtil.bytesToInt(headerBuf, 0);
+                    byte[] bodyBuf = new byte[bodyLength];
+
+                    in.read(bodyBuf); // 输出
+
+                    result = getMessage(new String(bodyBuf));
+                    System.out.println("server said:" + result);
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+//                    e.printStackTrace();
+                }
+            }
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
+            if (socket != null) {
+                try {
+                    socket.close();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        }
+
+        return result;
     }
 }
