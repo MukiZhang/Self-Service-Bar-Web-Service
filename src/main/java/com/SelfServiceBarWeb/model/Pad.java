@@ -12,9 +12,18 @@ public class Pad {
     private Timestamp use_at;
     private String seat_id;
     private String producer;
+    private String bar_id;
 
     @ApiModelProperty(value = "pad的最近记录")
     private List<HardwareLog> hardwareLogs;
+
+    public String getBar_id() {
+        return bar_id;
+    }
+
+    public void setBar_id(String bar_id) {
+        this.bar_id = bar_id;
+    }
 
     public String getId() {
         return id;

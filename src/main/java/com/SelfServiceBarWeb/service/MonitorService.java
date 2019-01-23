@@ -31,8 +31,8 @@ public class MonitorService {
     }
 
     public List<Monitor> getAllMonitors(String token) throws Exception {
-        administratorService.getAdministratorIdFromToken(token);
-        List<Monitor> monitors = monitorMapper.getAll();
+        Administrator administrator = administratorService.getAdministratorIdFromToken(token);
+        List<Monitor> monitors = monitorMapper.getAll(administrator.getBar_id());
         for (Monitor monitor : monitors) {
             Hardware monitorState = hardwareStateMapper.getByIdAndType(monitor.getId(), HardwareTypeEnum.monitor.getValue());
             monitor.setState(HardwareStateEnum.getHardwareStateEnum(monitorState.getState()));
@@ -44,7 +44,7 @@ public class MonitorService {
 
     public Monitor getByMonitorId(String monitorId, String token) throws Exception {
         //验证token，用户或者管理员
-        administratorService.getAdministratorIdFromToken(token);
+        Administrator administrator = administratorService.getAdministratorIdFromToken(token);
         Monitor monitor = monitorMapper.getByMonitorId(monitorId);
         if (monitor == null)
             throw new SelfServiceBarWebException(400, ResponseMessage.ERROR, ResponseMessage.GET_MONITOR_INFO_ERROR);
@@ -57,16 +57,17 @@ public class MonitorService {
     }
 
     public Monitor createNewMonitor(CreateMonitorRequest createMonitorRequest) throws Exception {
-        administratorService.getAdministratorIdFromToken(createMonitorRequest.getLoginToken());
+        Administrator administrator = administratorService.getAdministratorIdFromToken(createMonitorRequest.getLoginToken());
 
         Monitor monitor = new Monitor();
         monitor.setLocation(createMonitorRequest.getLocation());
         monitor.setProducer(createMonitorRequest.getProducer());
         monitor.setCreate_at(createMonitorRequest.getCreate_at());
         monitor.setUse_at(createMonitorRequest.getUse_at());
+        monitor.setBar_id(administrator.getBar_id());
 
         //自动生成IP地址, 硬件编号
-        List<Monitor> monitors = monitorMapper.getAll();
+        List<Monitor> monitors = monitorMapper.getAll(administrator.getBar_id());
         long maxIp = CommonUtil.ipToLong("192.168.1.0");
         long maxHardwareID = 0;
         for (Monitor tempmonitor : monitors) {
@@ -97,7 +98,7 @@ public class MonitorService {
     }
 
     public Monitor changeMonitorState(String monitorId, ChangeMonitorRequest changeMonitorRequest) throws Exception {
-        administratorService.getAdministratorIdFromToken(changeMonitorRequest.getToken());
+        Administrator administrator = administratorService.getAdministratorIdFromToken(changeMonitorRequest.getToken());
 
         Monitor monitor = monitorMapper.getByMonitorId(monitorId);
         HardwareLog hardwareLog;
@@ -124,9 +125,9 @@ public class MonitorService {
     }
 
     public boolean changeAllMonitorState(String token, MonitorStateEnum monitorStateEnum) throws Exception {
-        administratorService.getAdministratorIdFromToken(token);
+        Administrator administrator = administratorService.getAdministratorIdFromToken(token);
 
-        List<Monitor> monitors = monitorMapper.getAll();
+        List<Monitor> monitors = monitorMapper.getAll(administrator.getBar_id());
 
         for (Monitor monitor : monitors) {
             //更改灯的状态

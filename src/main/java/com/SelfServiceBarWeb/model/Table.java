@@ -35,6 +35,16 @@ public class Table {
     @ApiModelProperty(value = "生产商")
     private String producer;
 
+    private String bar_id;
+
+    public String getBar_id() {
+        return bar_id;
+    }
+
+    public void setBar_id(String bar_id) {
+        this.bar_id = bar_id;
+    }
+
     public String getId() {
         return id;
     }

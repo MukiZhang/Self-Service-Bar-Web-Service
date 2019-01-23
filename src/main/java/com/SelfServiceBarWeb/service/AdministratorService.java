@@ -59,17 +59,17 @@ public class AdministratorService {
     }
 
     public void logout(String token) throws Exception {
-        String administratorId = getAdministratorIdFromToken(token);
-        administratorMapper.updateTokenCreateTimeById(null, administratorId);
+        Administrator administrator = getAdministratorIdFromToken(token);
+        administratorMapper.updateTokenCreateTimeById(null, administrator.getId());
     }
 
     public HashMap<String, Object> getLayout(String token) throws Exception {
-        getAdministratorIdFromToken(token);
+        Administrator administrator = getAdministratorIdFromToken(token);
         List<List<Integer>> res = new ArrayList<>();
         int[][] layoutArray = new int[row][column];
         HashMap<String, String> seatIds = new HashMap<>();
 
-        List<Seat> seatPosition = seatMapper.getAllSeatPosition();
+        List<Seat> seatPosition = seatMapper.getAllSeatPosition(administrator.getBar_id());
         for (Seat seat : seatPosition) {
             int x = Integer.valueOf(seat.getPosition_x());
             int y = Integer.valueOf(seat.getPosition_y());
@@ -79,7 +79,7 @@ public class AdministratorService {
             seatIds.put(x + "+" + y, seat.getId());
         }
 
-        List<Table> tablePosition = tableMapper.getAll();
+        List<Table> tablePosition = tableMapper.getAll(administrator.getBar_id());
         for (Table table : tablePosition) {
             int leftUpX = Integer.valueOf(table.getLeft_up_x_coordinate());
             int leftUpY = Integer.valueOf(table.getLeft_up_y_coordinate());
@@ -103,7 +103,7 @@ public class AdministratorService {
         return resMap;
     }
 
-    public String getAdministratorIdFromToken(String token) throws Exception {
+    public Administrator getAdministratorIdFromToken(String token) throws Exception {
         SimpleDateFormat mysqlSdf = new java.text.SimpleDateFormat(mysqlSdfPatternString);
         if (Objects.equals(token, "noToken"))
             throw new SelfServiceBarWebException(403, ResponseMessage.ERROR, ResponseMessage.DO_NOT_LOGIN);
@@ -118,7 +118,7 @@ public class AdministratorService {
             throw new SelfServiceBarWebException(403, ResponseMessage.ERROR, ResponseMessage.ALREADY_LOGIN);
         else if (jwt.getExpiresAt().getTime() < now.getTime())
             throw new SelfServiceBarWebException(403, ResponseMessage.ERROR, ResponseMessage.EXPIRED_USER_TOKEN);
-        else return userId;
+        else return administratorMapper.getById(userId);
     }
 
 }

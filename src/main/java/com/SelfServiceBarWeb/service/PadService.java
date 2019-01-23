@@ -31,8 +31,8 @@ public class PadService {
     }
 
     public List<Pad> getAllPads(String token) throws Exception {
-        administratorService.getAdministratorIdFromToken(token);
-        List<Pad> pads = padMapper.getAll();
+        Administrator administrator = administratorService.getAdministratorIdFromToken(token);
+        List<Pad> pads = padMapper.getAll(administrator.getBar_id());
         for (Pad pad : pads) {
             pad.setHardwareLogs(hardwareLogMapper.getRecentByIdAndType(pad.getId(), HardwareTypeEnum.pad.getValue()));
         }
@@ -45,7 +45,7 @@ public class PadService {
     }
 
     public Pad addNewPad(CreatePadRequest createPadRequest) throws Exception {
-        administratorService.getAdministratorIdFromToken(createPadRequest.getLoginToken());
+        Administrator administrator = administratorService.getAdministratorIdFromToken(createPadRequest.getLoginToken());
 
         Pad pad = new Pad();
         pad.setSeat_id(createPadRequest.getSeatId());
@@ -53,6 +53,7 @@ public class PadService {
         pad.setCreate_at(createPadRequest.getCreate_at());
         pad.setUse_at(createPadRequest.getUse_at());
         pad.setIp_address(createPadRequest.getIpAddress());
+        pad.setBar_id(administrator.getBar_id());
 
         //加入数据库
         padMapper.createNewPad(pad);
@@ -86,8 +87,8 @@ public class PadService {
         //过期时间应为订单所选时间到时时间
         Date expireTime = mysqlSdf.parse("3000-1-1 00:00:00");
         Map<String, String> content = new HashMap<>();
-        content.put("padId", pad.getId());
         content.put("seatId", pad.getSeat_id());
+        content.put("barId", pad.getBar_id());
 
         res.put("padId", pad.getId());
         res.put("token", CommonUtil.createJWT(content, "padControlToken", createTime, expireTime));
