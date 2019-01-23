@@ -522,4 +522,10 @@ public class LightHardware extends BasicFunction implements Device {
         return State;
     }
 
+    @Override
+    public String testConnection(String ip, int port) {
+        byte[] message = {0x01, 0x01};
+        return new Clinet().unicastToChair(ip, port, message);
+    }
+
 }
