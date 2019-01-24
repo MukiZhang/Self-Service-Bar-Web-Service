@@ -20,23 +20,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 public class SelfServiceBarWebApplication {
     public static void main(String[] args) {
-        //启动socket服务
-//        SocketServer server = new SocketServer();
-//        ServerSocket ss=server.startSocketServer(8188);
-
-//        server.startSocketServer(8188);
-
-
         Logger logger = LoggerFactory.getLogger(SelfServiceBarWebApplication.class);
         logger.debug("start application");
         SpringApplication.run(SelfServiceBarWebApplication.class, args);
-
-
-
-
-
-        /*PrintStream out = new PrintStream(ss.getOutputStream());
-        //获取Socket的输入流，用来接收从客户端发送过来的数据
-        BufferedReader buf = new BufferedReader(new InputStreamReader(ss.getInputStream()));*/
     }
 }

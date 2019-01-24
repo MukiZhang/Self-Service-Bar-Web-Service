@@ -14,7 +14,6 @@ import com.SelfServiceBarWeb.utils.CommonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -68,6 +67,7 @@ public class SeatService {
         if (seat == null)
             throw new SelfServiceBarWebException(400, ResponseMessage.ERROR, ResponseMessage.GET_SEAT_INFO_ERROR);
 
+        //根据ip地址+座位位置定位座位硬件信息
         Hardware seatState = hardwareStateMapper.getByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue());
         seat.setState(HardwareStateEnum.getHardwareStateEnum(seatState.getState()));
         seat.setHardwareLogs(hardwareLogMapper.getRecentByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue()));
