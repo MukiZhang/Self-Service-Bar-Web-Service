@@ -30,8 +30,8 @@ public class PowerSourceService {
     }
 
     public List<PowerSource> getAllPowerSources(String token) throws Exception {
-        administratorService.getAdministratorIdFromToken(token);
-        List<PowerSource> powerSources = powerSourceMapper.getAll();
+        Administrator administrator = administratorService.getAdministratorIdFromToken(token);
+        List<PowerSource> powerSources = powerSourceMapper.getAll(administrator.getBar_id());
         for (PowerSource powerSource : powerSources) {
             Hardware powerSourceState = hardwareStateMapper.getByIdAndType(powerSource.getId(), HardwareTypeEnum.power_source.getValue());
             powerSource.setState(HardwareStateEnum.getHardwareStateEnum(powerSourceState.getState()));
@@ -42,7 +42,7 @@ public class PowerSourceService {
     }
 
     public PowerSource createNewPowerSource(CreatePowerSourceRequest createPowerSourceRequest) throws Exception {
-        administratorService.getAdministratorIdFromToken(createPowerSourceRequest.getLoginToken());
+        Administrator administrator = administratorService.getAdministratorIdFromToken(createPowerSourceRequest.getLoginToken());
 
         PowerSource powerSource = new PowerSource();
         powerSource.setSeat_id(createPowerSourceRequest.getSeatId());
@@ -50,9 +50,10 @@ public class PowerSourceService {
         powerSource.setCreate_at(createPowerSourceRequest.getCreate_at());
         powerSource.setUse_at(createPowerSourceRequest.getUse_at());
         powerSource.setType(createPowerSourceRequest.getType().getValue());
+        powerSource.setBar_id(administrator.getBar_id());
 
         //自动生成IP地址, 硬件编号
-        List<PowerSource> powerSources = powerSourceMapper.getAll();
+        List<PowerSource> powerSources = powerSourceMapper.getAll(administrator.getBar_id());
         long maxIp = CommonUtil.ipToLong("192.168.4.0");
         long maxHardwareID = 0;
         for (PowerSource temppowerSource : powerSources) {
@@ -111,8 +112,8 @@ public class PowerSourceService {
 
     public boolean changeAllPowerSourceState(String token, PowerSourceStateEnum modeEnum) throws Exception {
         //验证管理员或用户的身份
-        administratorService.getAdministratorIdFromToken(token);
-        List<PowerSource> powerSources = powerSourceMapper.getAll();
+        Administrator administrator = administratorService.getAdministratorIdFromToken(token);
+        List<PowerSource> powerSources = powerSourceMapper.getAll(administrator.getBar_id());
 
         for (PowerSource powerSource : powerSources) {
             //更改灯的状态

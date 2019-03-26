@@ -38,9 +38,9 @@ public class SeatService {
     }
 
     public List<Seat> getAllSeats(String token) throws Exception {
-        administratorService.getAdministratorIdFromToken(token);
+        Administrator administrator = administratorService.getAdministratorIdFromToken(token);
 
-        List<Seat> seats = seatMapper.getAllSeats();
+        List<Seat> seats = seatMapper.getAllSeats(administrator.getBar_id());
         for (Seat seat : seats) {
             Hardware seatState = hardwareStateMapper.getByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue());
             seat.setState(HardwareStateEnum.getHardwareStateEnum(seatState.getState()));
@@ -76,7 +76,7 @@ public class SeatService {
     }
 
     public Seat createNewSeat(CreateSeatRequest createSeatRequest) throws Exception {
-        administratorService.getAdministratorIdFromToken(createSeatRequest.getLoginToken());
+        Administrator administrator = administratorService.getAdministratorIdFromToken(createSeatRequest.getLoginToken());
 
         Table table = tableMapper.getTableById(createSeatRequest.getTable_id());
         if (table == null)
@@ -92,9 +92,10 @@ public class SeatService {
         seat.setProducer(createSeatRequest.getProducer());
         seat.setCreate_at(createSeatRequest.getCreate_at());
         seat.setUse_at(createSeatRequest.getUse_at());
+        seat.setBar_id(administrator.getBar_id());
 
         //自动生成IP地址, 硬件编号
-        List<Seat> seats = seatMapper.getAllSeats();
+        List<Seat> seats = seatMapper.getAllSeats(administrator.getBar_id());
         long maxIp = CommonUtil.ipToLong("192.168.0.0");
         long maxHardwareID = 0;
         for (Seat tempseat : seats) {
@@ -153,8 +154,8 @@ public class SeatService {
 
     public boolean changeAllSeatState(String token, SeatStateEnum modeEnum) throws Exception {
         //验证管理员或用户的身份
-        administratorService.getAdministratorIdFromToken(token);
-        List<Seat> seats = seatMapper.getAllSeats();
+        Administrator administrator = administratorService.getAdministratorIdFromToken(token);
+        List<Seat> seats = seatMapper.getAllSeats(administrator.getBar_id());
 
         for (Seat seat : seats) {
             //更改灯的状态
