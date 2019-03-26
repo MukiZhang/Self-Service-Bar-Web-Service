@@ -21,6 +21,17 @@ public class Hardware {
     @ApiModelProperty(value = "灯光色温")
     private Integer color_temperature;
 
+    @ApiModelProperty(value = "是否有对应的硬件")
+    private Integer availability;
+
+    public Integer getAvailability() {
+        return availability;
+    }
+
+    public void setAvailability(Integer availability) {
+        this.availability = availability;
+    }
+
     public Hardware(String device_id, Integer type) {
         this.device_id = device_id;
         this.type = type;

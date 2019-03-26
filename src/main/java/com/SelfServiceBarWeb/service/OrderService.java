@@ -20,4 +20,8 @@ public class OrderService {
     public void createOrder(CreateOrderRequest createOrderRequest) throws Exception {
         orderMapper.createOrder(createOrderRequest);
     }
+
+    public void renewOrder(String orderNo, String renewedEndHour) throws Exception {
+
+    }
 }

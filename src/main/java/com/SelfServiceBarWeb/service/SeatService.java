@@ -14,7 +14,6 @@ import com.SelfServiceBarWeb.utils.CommonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -68,6 +67,7 @@ public class SeatService {
         if (seat == null)
             throw new SelfServiceBarWebException(400, ResponseMessage.ERROR, ResponseMessage.GET_SEAT_INFO_ERROR);
 
+        //根据ip地址+座位位置定位座位硬件信息
         Hardware seatState = hardwareStateMapper.getByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue());
         seat.setState(HardwareStateEnum.getHardwareStateEnum(seatState.getState()));
         seat.setHardwareLogs(hardwareLogMapper.getRecentByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue()));
@@ -116,7 +116,7 @@ public class SeatService {
         seat.setState(HardwareStateEnum.close);
 
         //加入日志
-        HardwareLog hardwareLog = new HardwareLog(seat.getId(), HardwareTypeEnum.seat.getValue(), "administer", HardwareStateEnum.create.getValue(), "");
+        HardwareLog hardwareLog = new HardwareLog(seat.getId(), HardwareTypeEnum.seat.getValue(), ResponseMessage.ADMINISTER, HardwareStateEnum.create.getValue(), "");
         hardwareLogMapper.createNewLog(hardwareLog);
 
         seat.setHardwareLogs(hardwareLogMapper.getRecentByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue()));
@@ -136,18 +136,46 @@ public class SeatService {
             case open:
                 hardwareStateMapper.openByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue());
                 //加入日志
-                hardwareLog = new HardwareLog(seat.getId(), HardwareTypeEnum.seat.getValue(), "administer", HardwareStateEnum.open.getValue(), "");
+                hardwareLog = new HardwareLog(seat.getId(), HardwareTypeEnum.seat.getValue(), ResponseMessage.ADMINISTER, HardwareStateEnum.open.getValue(), "");
                 hardwareLogMapper.createNewLog(hardwareLog);
                 break;
             case close:
                 hardwareStateMapper.closeByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue());
                 //加入日志
-                hardwareLog = new HardwareLog(seat.getId(), HardwareTypeEnum.seat.getValue(), "administer", HardwareStateEnum.close.getValue(), "");
+                hardwareLog = new HardwareLog(seat.getId(), HardwareTypeEnum.seat.getValue(), ResponseMessage.ADMINISTER, HardwareStateEnum.close.getValue(), "");
                 hardwareLogMapper.createNewLog(hardwareLog);
                 break;
         }
         seat.setHardwareLogs(hardwareLogMapper.getRecentByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue()));
 
         return seat;
+    }
+
+    public boolean changeAllSeatState(String token, SeatStateEnum modeEnum) throws Exception {
+        //验证管理员或用户的身份
+        administratorService.getAdministratorIdFromToken(token);
+        List<Seat> seats = seatMapper.getAllSeats();
+
+        for (Seat seat : seats) {
+            //更改灯的状态
+            switch (modeEnum) {
+                case close: {
+                    hardwareStateMapper.closeByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue());
+                    break;
+                }
+                case open: {
+                    hardwareStateMapper.openByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue());
+                    break;
+                }
+            }
+        }
+        HardwareLog hardwareLog;
+        if (modeEnum == SeatStateEnum.close)
+            hardwareLog = new HardwareLog("99999", HardwareTypeEnum.seat.getValue(), "admin", HardwareStateEnum.close.getValue(), "");
+        else
+            hardwareLog = new HardwareLog("99999", HardwareTypeEnum.seat.getValue(), "admin", HardwareStateEnum.open.getValue(), "");
+        hardwareLogMapper.createNewLog(hardwareLog);
+
+        return true;
     }
 }

@@ -14,6 +14,9 @@ public class Administrator {
     @ApiModelProperty(value = "用户名")
     private String name;
 
+    @ApiModelProperty(value = "无人吧id")
+    private String bar_id;
+
     @ApiModelProperty(value = "用户密码")
     private String password;
 
@@ -25,6 +28,14 @@ public class Administrator {
 
     @ApiModelProperty(value = "登录token")
     private String loginToken;
+
+    public String getBar_id() {
+        return bar_id;
+    }
+
+    public void setBar_id(String bar_id) {
+        this.bar_id = bar_id;
+    }
 
     public String getId() {
         return id;

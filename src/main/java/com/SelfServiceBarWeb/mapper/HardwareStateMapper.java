@@ -15,6 +15,9 @@ public interface HardwareStateMapper {
     @Select("SELECT * FROM hardware_state WHERE device_id=#{id} AND type=#{type};")
     Hardware getByIdAndType(@Param("id") String id, @Param("type") Integer type);
 
+    @Select("SELECT availability FROM hardware_state WHERE device_id=#{id} AND type=#{type};")
+    Integer getAvailabilityByIdAndType(@Param("id") String id, @Param("type") Integer type);
+
     @Select("SELECT * FROM hardware_state WHERE type=#{type};")
     List<Hardware> getAllByType(@Param("type") Integer type);
 
