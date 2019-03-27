@@ -128,8 +128,6 @@ public class SeatService {
     }
 
     public Seat changeSeatState(String seatId, ChangeSeatRequest changeSeatRequest) throws Exception {
-//        socketServer.open();
-
         administratorService.getAdministratorIdFromToken(changeSeatRequest.getToken());
 
         Seat seat = seatMapper.getBySeatId(seatId);
@@ -152,6 +150,8 @@ public class SeatService {
                 break;
             case close:
                 hardwareStateMapper.closeByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue());
+                //硬件控制
+                socketServer.closeById(Integer.parseInt(seat.getHardwareId()));
                 //加入日志
                 hardwareLog = new HardwareLog(seat.getId(), HardwareTypeEnum.seat.getValue(), ResponseMessage.ADMINISTER, HardwareStateEnum.close.getValue(), "");
                 hardwareLogMapper.createNewLog(hardwareLog);
@@ -171,10 +171,12 @@ public class SeatService {
             //更改灯的状态
             switch (modeEnum) {
                 case close: {
+                    socketServer.closeById(Integer.valueOf(seat.getHardwareId()));
                     hardwareStateMapper.closeByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue());
                     break;
                 }
                 case open: {
+                    socketServer.openById(Integer.valueOf(seat.getHardwareId()));
                     hardwareStateMapper.openByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue());
                     break;
                 }
