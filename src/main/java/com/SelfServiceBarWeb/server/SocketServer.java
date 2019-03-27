@@ -131,12 +131,125 @@ public class SocketServer {
             //stx
             responseBodyBuf[1] = 0x02;
 
+            //序号
             responseBodyBuf[2] = 0x00;
             responseBodyBuf[3] = 0x31;
+            //命令代码--打开客人模式
             responseBodyBuf[4] = 0x02;
             responseBodyBuf[5] = 0x03;
+            //椅子序号
             responseBodyBuf[6] = 0x00;
             responseBodyBuf[7] = 0x01;
+
+            responseBodyBuf[18] = 0x10;
+            responseBodyBuf[19] = 0x03;
+            responseBodyBuf[20] = 0x36;
+
+            socketOut.write(responseBodyBuf);
+            while ((len = in.read(buf)) != -1) {
+                System.out.println("len:" + len);
+                for (int i = 0; i < len; i++) {
+                    System.out.println(buf[i]);
+                }
+                String data = new String(buf, 0, len);
+//                System.out.println(data);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (out != null) {
+                out.close();
+            }
+            if (in != null) {
+                in.close();
+            }
+        }
+    }
+
+    public void close() throws IOException {
+        InputStream in = null;
+        OutputStream out = null;
+        byte[] buf = new byte[1024];
+        int len;
+        try {
+            if (clientSocket == null)
+                clientSocket = serverSocket.accept();
+            System.out.println(clientSocket.getPort());
+            System.out.println(clientSocket.getInetAddress());
+            out = clientSocket.getOutputStream();
+            in = clientSocket.getInputStream();
+            DataOutputStream socketOut = new DataOutputStream(out);
+            byte[] responseBodyBuf = new byte[21];
+            //dle
+            responseBodyBuf[0] = 0x10;
+            //stx
+            responseBodyBuf[1] = 0x02;
+
+            //序号
+            responseBodyBuf[2] = 0x00;
+            responseBodyBuf[3] = 0x31;
+            //命令代码--关闭客人模式
+            responseBodyBuf[4] = 0x02;
+            responseBodyBuf[5] = 0x04;
+            //椅子序号
+            responseBodyBuf[6] = 0x00;
+            responseBodyBuf[7] = 0x01;
+
+            responseBodyBuf[18] = 0x10;
+            responseBodyBuf[19] = 0x03;
+            responseBodyBuf[20] = 0x37;
+
+            socketOut.write(responseBodyBuf);
+            if ((len = in.read(buf)) != -1) {
+                System.out.println("len:" + len);
+                for (int i = 0; i < len; i++) {
+                    System.out.println(buf[i]);
+                }
+                String data = new String(buf, 0, len);
+//                System.out.println(data);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (out != null) {
+                out.close();
+            }
+            if (in != null) {
+                in.close();
+            }
+        }
+    }
+
+    public void openById(int id) throws IOException {
+        InputStream in = null;
+        OutputStream out = null;
+        byte[] buf = new byte[1024];
+        int len;
+        try {
+            if (clientSocket == null)
+                clientSocket = serverSocket.accept();
+            System.out.println(clientSocket.getPort());
+            System.out.println(clientSocket.getInetAddress());
+            out = clientSocket.getOutputStream();
+            in = clientSocket.getInputStream();
+            DataOutputStream socketOut = new DataOutputStream(out);
+            byte[] responseBodyBuf = new byte[21];
+            //dle
+            responseBodyBuf[0] = 0x10;
+            //stx
+            responseBodyBuf[1] = 0x02;
+
+            //序号
+            responseBodyBuf[2] = 0x00;
+            responseBodyBuf[3] = 0x31;
+            //命令代码--打开客人模式
+            responseBodyBuf[4] = 0x02;
+            responseBodyBuf[5] = 0x03;
+            //椅子序号
+            responseBodyBuf[6] = 0x00;
+            responseBodyBuf[7] = 0x00;
+            if (id % 2 == 1)
+                responseBodyBuf[7] = 0x01;
+            if (id / 2 == 1 && id % 2 == 0)
+                responseBodyBuf[7] = 0x10;
 
             responseBodyBuf[18] = 0x10;
             responseBodyBuf[19] = 0x03;
