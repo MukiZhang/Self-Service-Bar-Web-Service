@@ -252,6 +252,7 @@ public class SocketServer {
         byte[] command = ChairCommand.CLOSE_CHAIR_FOR_GUEST;
         byte[] chairId = int2Bytes(id);
         byte[] res = sendCommandToChair(phraseCommand(getNewSeq(), command, chairId));
+        System.out.println(bytesToHex(res));
     }
 
     private byte[] phraseCommand(byte[] seq, byte[] commandContent, byte[] addition) {
@@ -261,7 +262,11 @@ public class SocketServer {
         command.add(ChairCommand.DLE);
         command.add(ChairCommand.STX);
 
-        //时序号码
+        //时序号码-需要转义
+        if (seq[0] == ChairCommand.DLE)
+            command.add(ChairCommand.DLE);
+        if (seq[1] == ChairCommand.DLE)
+            command.add(ChairCommand.DLE);
         command.add(seq[0]);
         sum += seq[0];
         command.add(seq[1]);
@@ -282,6 +287,10 @@ public class SocketServer {
                 sum += b;
             }
         }
+        //填充字符
+        byte full = 0x00;
+        for (int i = 0; i < 10; i++)
+            command.add(full);
         //固定的结束字段
         command.add(ChairCommand.DLE);
         command.add(ChairCommand.ETX);
