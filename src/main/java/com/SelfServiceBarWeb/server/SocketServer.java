@@ -22,6 +22,7 @@ public class SocketServer {
             '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
     private Socket clientSocket;
     private ServerSocket serverSocket;
+    private int seq = 0;
 
     public SocketServer() {
         try {
@@ -32,40 +33,9 @@ public class SocketServer {
         }
     }
 
-    private byte[] phraseCommand(byte[] commandContent, Byte[] addition) {
-        List<Byte> command = new ArrayList<>();
-        byte sum = (byte) 0xFF;
-        //头部
-        command.add(ChairCommand.DLE);
-        command.add(ChairCommand.STX);
-        //命令
-        for (byte b : commandContent) {
-            command.add(b);
-            sum += b;
-        }
-        //附加数据
-        if (addition != null) {
-            for (byte b : addition) {
-                command.add(b);
-                sum += b;
-            }
-        }
-        //尾部
-        command.add(ChairCommand.DLE);
-        command.add(ChairCommand.ETX);
-        command.add(sum);
-        //转换为array
-        int i = 0;
-        byte[] commandArray = new byte[command.size()];
-        for (byte b : command)
-            commandArray[i++] = b;
-        System.out.println(bytesToHex(commandArray));
-        return commandArray;
-    }
-
     public Boolean getConnectionStatus() throws IOException {
         byte[] command = ChairCommand.GET_CONNECTION_STATUS;
-        byte[] res = sendCommandToChair(phraseCommand(command, null));
+        byte[] res = sendCommandToChair(phraseCommand(getNewSeq(), command, null));
         System.out.println(bytesToHex(res));
         return true;
     }
@@ -131,12 +101,128 @@ public class SocketServer {
             //stx
             responseBodyBuf[1] = 0x02;
 
+            //序号
             responseBodyBuf[2] = 0x00;
             responseBodyBuf[3] = 0x31;
+            //命令代码--打开客人模式
             responseBodyBuf[4] = 0x02;
             responseBodyBuf[5] = 0x03;
+            //椅子序号
             responseBodyBuf[6] = 0x00;
             responseBodyBuf[7] = 0x01;
+
+            responseBodyBuf[18] = 0x10;
+            responseBodyBuf[19] = 0x03;
+            responseBodyBuf[20] = 0x36;
+
+            socketOut.write(responseBodyBuf);
+            while ((len = in.read(buf)) != -1) {
+                System.out.println("len:" + len);
+                for (int i = 0; i < len; i++) {
+                    System.out.println(buf[i]);
+                }
+                String data = new String(buf, 0, len);
+//                System.out.println(data);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (out != null) {
+                out.close();
+            }
+            if (in != null) {
+                in.close();
+            }
+        }
+    }
+
+    public void close() throws IOException {
+        InputStream in = null;
+        OutputStream out = null;
+        byte[] buf = new byte[1024];
+        int len;
+        try {
+            if (clientSocket == null)
+                clientSocket = serverSocket.accept();
+            System.out.println(clientSocket.getPort());
+            System.out.println(clientSocket.getInetAddress());
+            out = clientSocket.getOutputStream();
+            in = clientSocket.getInputStream();
+            DataOutputStream socketOut = new DataOutputStream(out);
+            byte[] responseBodyBuf = new byte[21];
+            //dle
+            responseBodyBuf[0] = 0x10;
+            //stx
+            responseBodyBuf[1] = 0x02;
+
+            //序号
+            responseBodyBuf[2] = 0x00;
+            responseBodyBuf[3] = 0x31;
+            //命令代码--关闭客人模式
+            responseBodyBuf[4] = 0x02;
+            responseBodyBuf[5] = 0x04;
+            //椅子序号
+            responseBodyBuf[6] = 0x00;
+            responseBodyBuf[7] = 0x01;
+
+            responseBodyBuf[18] = 0x10;
+            responseBodyBuf[19] = 0x03;
+            responseBodyBuf[20] = 0x37;
+
+            socketOut.write(responseBodyBuf);
+            if ((len = in.read(buf)) != -1) {
+                System.out.println("len:" + len);
+                for (int i = 0; i < len; i++) {
+                    System.out.println(buf[i]);
+                }
+                String data = new String(buf, 0, len);
+//                System.out.println(data);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (out != null) {
+                out.close();
+            }
+            if (in != null) {
+                in.close();
+            }
+        }
+    }
+
+    public void openById(int id) throws IOException {
+        byte[] command = ChairCommand.OPEN_CHAIR_FOR_GUEST;
+        byte[] chairId = int2Bytes(id);
+        byte[] res = sendCommandToChair(phraseCommand(getNewSeq(), command, chairId));
+        /*InputStream in = null;
+        OutputStream out = null;
+        byte[] buf = new byte[1024];
+        int len;
+        try {
+            if (clientSocket == null)
+                clientSocket = serverSocket.accept();
+            System.out.println(clientSocket.getPort());
+            System.out.println(clientSocket.getInetAddress());
+            out = clientSocket.getOutputStream();
+            in = clientSocket.getInputStream();
+            DataOutputStream socketOut = new DataOutputStream(out);
+            byte[] responseBodyBuf = new byte[21];
+            //dle
+            responseBodyBuf[0] = 0x10;
+            //stx
+            responseBodyBuf[1] = 0x02;
+
+            //序号
+            responseBodyBuf[2] = 0x00;
+            responseBodyBuf[3] = 0x31;
+            //命令代码--打开客人模式
+            responseBodyBuf[4] = 0x02;
+            responseBodyBuf[5] = 0x03;
+            //椅子序号
+            responseBodyBuf[6] = 0x00;
+            responseBodyBuf[7] = 0x00;
+            if (id % 2 == 1)
+                responseBodyBuf[7] = 0x01;
+            if (id / 2 == 1 && id % 2 == 0)
+                responseBodyBuf[7] = 0x10;
 
             responseBodyBuf[18] = 0x10;
             responseBodyBuf[19] = 0x03;
@@ -159,7 +245,55 @@ public class SocketServer {
             if (in != null) {
                 in.close();
             }
+        }*/
+    }
+
+    public void closeById(int id) throws IOException {
+        byte[] command = ChairCommand.CLOSE_CHAIR_FOR_GUEST;
+        byte[] chairId = int2Bytes(id);
+        byte[] res = sendCommandToChair(phraseCommand(getNewSeq(), command, chairId));
+    }
+
+    private byte[] phraseCommand(byte[] seq, byte[] commandContent, byte[] addition) {
+        List<Byte> command = new ArrayList<>();
+        byte sum = (byte) 0xFF;
+        //固定的起始字段
+        command.add(ChairCommand.DLE);
+        command.add(ChairCommand.STX);
+
+        //时序号码
+        command.add(seq[0]);
+        sum += seq[0];
+        command.add(seq[1]);
+        sum += seq[1];
+        //命令
+        for (byte b : commandContent) {
+            if (b == ChairCommand.DLE)
+                command.add(ChairCommand.DLE);
+            command.add(b);
+            sum += b;
         }
+        //附加数据
+        if (addition != null) {
+            for (byte b : addition) {
+                if (b == ChairCommand.DLE)
+                    command.add(ChairCommand.DLE);
+                command.add(b);
+                sum += b;
+            }
+        }
+        //固定的结束字段
+        command.add(ChairCommand.DLE);
+        command.add(ChairCommand.ETX);
+        //sum校验和
+        command.add(sum);
+        //转换为array
+        int i = 0;
+        byte[] commandArray = new byte[command.size()];
+        for (byte b : command)
+            commandArray[i++] = b;
+        System.out.println(bytesToHex(commandArray));
+        return commandArray;
     }
 
     private byte[] sendCommandToChair(byte[] command) throws IOException {
@@ -202,4 +336,18 @@ public class SocketServer {
         return new String(buf);
     }
 
+    private byte[] getNewSeq() {
+        seq++;
+        byte[] b = new byte[2];
+        b[0] = (byte) (seq >> 8 & 0xff);
+        b[1] = (byte) (seq & 0xff);
+        return b;
+    }
+
+    private byte[] int2Bytes(int n) {
+        byte[] b = new byte[2];
+        b[0] = (byte) (n >> 8 & 0xff);
+        b[1] = (byte) (n & 0xff);
+        return b;
+    }
 }

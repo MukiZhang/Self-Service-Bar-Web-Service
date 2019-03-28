@@ -10,6 +10,7 @@ import com.SelfServiceBarWeb.model.*;
 import com.SelfServiceBarWeb.model.request.ChangeSeatRequest;
 import com.SelfServiceBarWeb.model.request.CreateSeatRequest;
 import com.SelfServiceBarWeb.model.request.SeatStateEnum;
+import com.SelfServiceBarWeb.server.SocketServer;
 import com.SelfServiceBarWeb.utils.CommonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,14 +28,16 @@ public class SeatService {
     private final AdministratorService administratorService;
     private final HardwareStateMapper hardwareStateMapper;
     private final HardwareLogMapper hardwareLogMapper;
+    private final SocketServer socketServer;
 
     @Autowired
-    public SeatService(SeatMapper seatMapper, TableMapper tableMapper, AdministratorService administratorService, HardwareStateMapper hardwareStateMapper, HardwareLogMapper hardwareLogMapper) {
+    public SeatService(SeatMapper seatMapper, TableMapper tableMapper, AdministratorService administratorService, HardwareStateMapper hardwareStateMapper, HardwareLogMapper hardwareLogMapper, SocketServer socketServer) {
         this.seatMapper = seatMapper;
         this.tableMapper = tableMapper;
         this.administratorService = administratorService;
         this.hardwareStateMapper = hardwareStateMapper;
         this.hardwareLogMapper = hardwareLogMapper;
+        this.socketServer = socketServer;
     }
 
     public List<Seat> getAllSeats(String token) throws Exception {
@@ -132,16 +135,24 @@ public class SeatService {
         HardwareLog hardwareLog;
         if (seat == null)
             throw new SelfServiceBarWebException(400, ResponseMessage.ERROR, ResponseMessage.GET_SEAT_INFO_ERROR);
+
+        //Integer hardwareAvailability = hardwareStateMapper.getAvailabilityByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue());
+
         //修改seat状态
         switch (changeSeatRequest.getMode()) {
             case open:
+                //模拟数据库操作
                 hardwareStateMapper.openByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue());
+                //硬件控制
+                socketServer.openById(Integer.parseInt(seat.getHardwareId()));
                 //加入日志
                 hardwareLog = new HardwareLog(seat.getId(), HardwareTypeEnum.seat.getValue(), ResponseMessage.ADMINISTER, HardwareStateEnum.open.getValue(), "");
                 hardwareLogMapper.createNewLog(hardwareLog);
                 break;
             case close:
                 hardwareStateMapper.closeByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue());
+                //硬件控制
+                socketServer.closeById(Integer.parseInt(seat.getHardwareId()));
                 //加入日志
                 hardwareLog = new HardwareLog(seat.getId(), HardwareTypeEnum.seat.getValue(), ResponseMessage.ADMINISTER, HardwareStateEnum.close.getValue(), "");
                 hardwareLogMapper.createNewLog(hardwareLog);
@@ -161,10 +172,12 @@ public class SeatService {
             //更改灯的状态
             switch (modeEnum) {
                 case close: {
+                    socketServer.closeById(Integer.valueOf(seat.getHardwareId()));
                     hardwareStateMapper.closeByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue());
                     break;
                 }
                 case open: {
+                    socketServer.openById(Integer.valueOf(seat.getHardwareId()));
                     hardwareStateMapper.openByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue());
                     break;
                 }

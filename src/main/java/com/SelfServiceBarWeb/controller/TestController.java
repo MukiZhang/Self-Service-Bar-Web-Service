@@ -70,6 +70,13 @@ public class TestController {
         command[18] = 0x10;
         command[19] = 0x03;
         command[20] = 0x02;
-        socketServer.getConnectionStatus();
+//        socketServer.getConnectionStatus();
+        socketServer.open();
+    }
+
+    @ApiOperation(value = "测试椅子")
+    @RequestMapping(path = "/chair/close", method = RequestMethod.GET)
+    public void closeChair() throws Exception {
+        socketServer.close();
     }
 }
