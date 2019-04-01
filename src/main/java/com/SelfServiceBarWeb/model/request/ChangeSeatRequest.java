@@ -9,6 +9,17 @@ public class ChangeSeatRequest {
     @ApiModelProperty(value = "token")
     private String token;
 
+    @ApiModelProperty(value = "token类型：管理员或用户")
+    private TokenTypeEnum tokenTypeEnum;
+
+    public TokenTypeEnum getTokenTypeEnum() {
+        return tokenTypeEnum;
+    }
+
+    public void setTokenTypeEnum(TokenTypeEnum tokenTypeEnum) {
+        this.tokenTypeEnum = tokenTypeEnum;
+    }
+
     public SeatStateEnum getMode() {
         return mode;
     }

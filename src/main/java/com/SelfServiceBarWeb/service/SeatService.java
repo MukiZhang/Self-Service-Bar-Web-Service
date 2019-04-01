@@ -10,12 +10,16 @@ import com.SelfServiceBarWeb.model.*;
 import com.SelfServiceBarWeb.model.request.ChangeSeatRequest;
 import com.SelfServiceBarWeb.model.request.CreateSeatRequest;
 import com.SelfServiceBarWeb.model.request.SeatStateEnum;
+import com.SelfServiceBarWeb.model.request.TokenTypeEnum;
 import com.SelfServiceBarWeb.server.SocketServer;
 import com.SelfServiceBarWeb.utils.CommonUtil;
+import com.alibaba.fastjson.JSONObject;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by Muki on 2018/11/4
@@ -62,13 +66,30 @@ public class SeatService {
         return seats;
     }
 
-    public Seat getBySeatId(String seatId, String token) throws Exception {
-        //验证token，用户或者管理员
-        administratorService.getAdministratorIdFromToken(token);
-
+    public Seat getBySeatId(String seatId, String token, TokenTypeEnum tokenTypeEnum) throws Exception {
         Seat seat = seatMapper.getBySeatId(seatId);
+        switch (tokenTypeEnum) {
+            case administrator: {
+                administratorService.getAdministratorIdFromToken(token);
+                break;
+            }
+            case user: {
+                DecodedJWT jwt = CommonUtil.phraseJWT(token, "userControlToken", ResponseMessage.INVALID_CONTROL_TOKEN);
+                String barId = JSONObject.parseObject(jwt.getSubject()).getString("barId");
+                if (!Objects.equals(barId, seat.getBar_id()))
+                    throw new SelfServiceBarWebException(403, ResponseMessage.ERROR, ResponseMessage.INVALID_CONTROL_TOKEN);
+                break;
+            }
+            case pad: {
+                DecodedJWT jwt = CommonUtil.phraseJWT(token, "padControlToken", ResponseMessage.INVALID_CONTROL_TOKEN);
+                String id = JSONObject.parseObject(jwt.getSubject()).getString("seatId");
+                if (seatId != id)
+                    throw new SelfServiceBarWebException(404, ResponseMessage.ERROR, ResponseMessage.LIGHT_NOT_NOT_FOUND);
+                break;
+            }
+        }
         if (seat == null)
-            throw new SelfServiceBarWebException(400, ResponseMessage.ERROR, ResponseMessage.GET_SEAT_INFO_ERROR);
+            throw new SelfServiceBarWebException(404, ResponseMessage.ERROR, ResponseMessage.LIGHT_NOT_NOT_FOUND);
 
         //根据ip地址+座位位置定位座位硬件信息
         Hardware seatState = hardwareStateMapper.getByIdAndType(seat.getId(), HardwareTypeEnum.seat.getValue());
@@ -129,10 +150,33 @@ public class SeatService {
     }
 
     public Seat changeSeatState(String seatId, ChangeSeatRequest changeSeatRequest) throws Exception {
-        administratorService.getAdministratorIdFromToken(changeSeatRequest.getToken());
-
         Seat seat = seatMapper.getBySeatId(seatId);
         HardwareLog hardwareLog;
+        String identity = "";
+        switch (changeSeatRequest.getTokenTypeEnum()) {
+            case administrator: {
+                administratorService.getAdministratorIdFromToken(changeSeatRequest.getToken());
+                identity = ResponseMessage.ADMINISTER;
+                break;
+            }
+            case user: {
+                DecodedJWT jwt = CommonUtil.phraseJWT(changeSeatRequest.getToken(), "userControlToken", ResponseMessage.INVALID_CONTROL_TOKEN);
+                String barId = JSONObject.parseObject(jwt.getSubject()).getString("barId");
+                if (!Objects.equals(barId, seat.getBar_id()))
+                    throw new SelfServiceBarWebException(403, ResponseMessage.ERROR, ResponseMessage.INVALID_CONTROL_TOKEN);
+                identity = "user:" + JSONObject.parseObject(jwt.getSubject()).getString("uid");
+                break;
+            }
+            case pad: {
+                DecodedJWT jwt = CommonUtil.phraseJWT(changeSeatRequest.getToken(), "padControlToken", ResponseMessage.INVALID_CONTROL_TOKEN);
+                String id = JSONObject.parseObject(jwt.getSubject()).getString("seatId");
+                if (seatId != id)
+                    throw new SelfServiceBarWebException(404, ResponseMessage.ERROR, ResponseMessage.LIGHT_NOT_NOT_FOUND);
+                identity = "pad:" + JSONObject.parseObject(jwt.getSubject()).getString("padId");
+                break;
+            }
+        }
+
         if (seat == null)
             throw new SelfServiceBarWebException(400, ResponseMessage.ERROR, ResponseMessage.GET_SEAT_INFO_ERROR);
 
@@ -146,7 +190,7 @@ public class SeatService {
                 //硬件控制
                 socketServer.openById(Integer.parseInt(seat.getHardwareId()));
                 //加入日志
-                hardwareLog = new HardwareLog(seat.getId(), HardwareTypeEnum.seat.getValue(), ResponseMessage.ADMINISTER, HardwareStateEnum.open.getValue(), "");
+                hardwareLog = new HardwareLog(seat.getId(), HardwareTypeEnum.seat.getValue(), identity, HardwareStateEnum.open.getValue(), "");
                 hardwareLogMapper.createNewLog(hardwareLog);
                 break;
             case close:
@@ -154,7 +198,7 @@ public class SeatService {
                 //硬件控制
                 socketServer.closeById(Integer.parseInt(seat.getHardwareId()));
                 //加入日志
-                hardwareLog = new HardwareLog(seat.getId(), HardwareTypeEnum.seat.getValue(), ResponseMessage.ADMINISTER, HardwareStateEnum.close.getValue(), "");
+                hardwareLog = new HardwareLog(seat.getId(), HardwareTypeEnum.seat.getValue(), identity, HardwareStateEnum.close.getValue(), "");
                 hardwareLogMapper.createNewLog(hardwareLog);
                 break;
         }

@@ -34,8 +34,8 @@ public class SeatController {
     //该请求是管理员调用
     @ApiOperation(value = "获取指定id的座位信息")
     @RequestMapping(path = "/{seatId}", method = RequestMethod.GET)
-    public Seat getSeatInfo(@PathVariable(value = "seatId") String seatId, @RequestParam(value = "token") String token) throws Exception {
-        return seatService.getBySeatId(seatId, token);
+    public Seat getSeatInfo(@PathVariable(value = "seatId") String seatId, @RequestParam(value = "token") String token, @RequestParam(value = "tokenType") TokenTypeEnum tokenTypeEnum) throws Exception {
+        return seatService.getBySeatId(seatId, token, tokenTypeEnum);
     }
 
     @ApiOperation(value = "获取所有桌椅信息")
