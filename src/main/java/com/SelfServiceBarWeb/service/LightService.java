@@ -59,6 +59,7 @@ public class LightService {
             case pad: {
                 DecodedJWT jwt = CommonUtil.phraseJWT(token, "padControlToken", ResponseMessage.INVALID_CONTROL_TOKEN);
                 String seatId = JSONObject.parseObject(jwt.getSubject()).getString("seatId");
+                //String barId = JSONObject.parseObject(jwt.getSubject()).getString("barId");
                 light = lightMapper.getLightBySeatId(seatId);
                 break;
             }
@@ -91,8 +92,8 @@ public class LightService {
     }
 
     public List<Light> getAllLightInfo(String token) throws Exception {
-        administratorService.getAdministratorIdFromToken(token);
-        List<Light> lights = lightMapper.getAll();
+        Administrator administrator = administratorService.getAdministratorIdFromToken(token);
+        List<Light> lights = lightMapper.getAll(administrator.getBar_id());
         for (Light light : lights) {
             Hardware lightState = hardwareStateMapper.getByIdAndType(light.getId(), HardwareTypeEnum.light.getValue());
             perfectLightInfo(light, lightState);
@@ -101,16 +102,16 @@ public class LightService {
     }
 
     public Light createNewLight(CreateLightRequest createLightRequest) throws Exception {
-        String administratorId = administratorService.getAdministratorIdFromToken(createLightRequest.getLoginToken());
+        Administrator administrator = administratorService.getAdministratorIdFromToken(createLightRequest.getLoginToken());
         Light light = new Light();
         light.setSeat_id(createLightRequest.getSeatId());
         light.setProducer(createLightRequest.getProducer());
         light.setCreate_at(createLightRequest.getCreate_at());
         light.setUse_at(createLightRequest.getUse_at());
-        light.setBar_id(administratorMapper.getBarId(administratorId));
+        light.setBar_id(administrator.getBar_id());
 
         //自动生成IP地址, 硬件编号
-        List<Light> lights = lightMapper.getAll();
+        List<Light> lights = lightMapper.getAll(administrator.getBar_id());
         long maxIp = CommonUtil.ipToLong("192.168.3.0");
         long maxHardwareID = 0;
         for (Light tempLight : lights) {
@@ -141,8 +142,8 @@ public class LightService {
 
     public boolean changeAllLightState(String token, ChangeLightStateModeEnum modeEnum) throws Exception {
         //验证管理员或用户的身份
-        administratorService.getAdministratorIdFromToken(token);
-        List<Light> lights = lightMapper.getAll();
+        Administrator administrator = administratorService.getAdministratorIdFromToken(token);
+        List<Light> lights = lightMapper.getAll(administrator.getBar_id());
 
         for (Light light : lights) {
             //更改灯的状态
@@ -193,6 +194,7 @@ public class LightService {
             case pad: {
                 DecodedJWT jwt = CommonUtil.phraseJWT(changeLightRequest.getToken(), "padControlToken", ResponseMessage.INVALID_CONTROL_TOKEN);
                 String seatId = JSONObject.parseObject(jwt.getSubject()).getString("seatId");
+                //String barId = JSONObject.parseObject(jwt.getSubject()).getString("barId");
                 light = lightMapper.getLightBySeatId(seatId);
                 identity = "pad:" + JSONObject.parseObject(jwt.getSubject()).getString("padId");
                 break;

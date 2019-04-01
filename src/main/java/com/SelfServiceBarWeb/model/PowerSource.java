@@ -30,11 +30,21 @@ public class PowerSource {
     @ApiModelProperty(value = "种类")
     private Integer type;
 
+    private String bar_id;
+
     @ApiModelProperty(value = "电源的最近使用记录")
     private List<HardwareLog> hardwareLogs;
 
     @ApiModelProperty(value = "电源的状态")
     private HardwareStateEnum state;
+
+    public String getBar_id() {
+        return bar_id;
+    }
+
+    public void setBar_id(String bar_id) {
+        this.bar_id = bar_id;
+    }
 
     public HardwareStateEnum getState() {
         return state;

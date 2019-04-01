@@ -15,14 +15,14 @@ public interface LightMapper {
     @Select("SELECT id FROM light_info WHERE seat_id=#{seatId};")
     String getLightIdBySeatId(@Param("seatId") String seatId);
 
-    @Select("SELECT * FROM light_info WHERE seat_id=#{seatId};")
+    @Select("SELECT * FROM light_info WHERE seat_id=#{seatId}")
     Light getLightBySeatId(@Param("seatId") String seatId);
 
     @Select("SELECT * FROM light_info WHERE id=#{id};")
     Light getById(@Param("id") String id);
 
-    @Select("SELECT * FROM light_info;")
-    List<Light> getAll();
+    @Select("SELECT * FROM light_info WHERE bar_id=#{bar_id};")
+    List<Light> getAll(@Param("bar_id") String bar_id);
 
     @Insert("INSERT INTO light_info(ip_address,hardware_id,seat_id,bar_id,producer,create_at,use_at)" +
             " VALUES(#{ip_address}, #{hardware_id}, #{seat_id}, #{bar_id}, #{producer}, #{create_at}, #{use_at});")
