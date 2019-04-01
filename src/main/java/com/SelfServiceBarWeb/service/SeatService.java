@@ -83,7 +83,7 @@ public class SeatService {
             case pad: {
                 DecodedJWT jwt = CommonUtil.phraseJWT(token, "padControlToken", ResponseMessage.INVALID_CONTROL_TOKEN);
                 String id = JSONObject.parseObject(jwt.getSubject()).getString("seatId");
-                if (seatId != id)
+                if (!seatId.equals(id))
                     throw new SelfServiceBarWebException(404, ResponseMessage.ERROR, ResponseMessage.LIGHT_NOT_NOT_FOUND);
                 break;
             }
@@ -170,7 +170,7 @@ public class SeatService {
             case pad: {
                 DecodedJWT jwt = CommonUtil.phraseJWT(changeSeatRequest.getToken(), "padControlToken", ResponseMessage.INVALID_CONTROL_TOKEN);
                 String id = JSONObject.parseObject(jwt.getSubject()).getString("seatId");
-                if (seatId != id)
+                if (!seatId.equals(id))
                     throw new SelfServiceBarWebException(404, ResponseMessage.ERROR, ResponseMessage.LIGHT_NOT_NOT_FOUND);
                 identity = "pad:" + JSONObject.parseObject(jwt.getSubject()).getString("padId");
                 break;

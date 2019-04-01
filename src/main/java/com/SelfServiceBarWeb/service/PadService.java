@@ -90,6 +90,7 @@ public class PadService {
         content.put("seatId", pad.getSeat_id());
         content.put("barId", pad.getBar_id());
 
+        res.put("seatId", pad.getSeat_id());
         res.put("padId", pad.getId());
         res.put("token", CommonUtil.createJWT(content, "padControlToken", createTime, expireTime));
         return res;
